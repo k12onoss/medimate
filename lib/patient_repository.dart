@@ -82,7 +82,29 @@ class PatientRepository
 
   final client = http.Client();
 
-  Future<List> getPatientList() async
+  Future<List> getRecentPatientList(String date) async
+  {
+    // final uri = Uri.http(baseUrl, '/searchByDate');
+    //
+    // var regBody =
+    // {
+    //   "date": date,
+    // };
+    //
+    // final response = await client.post
+    //   (
+    //     uri,
+    //     headers: {"Content-Type":"application/json"},
+    //     body: jsonEncode(regBody)
+    // );
+    //
+    // final json = jsonDecode(response.body);
+    // return json;
+
+    return dummyList;
+  }
+
+  Future<List> getAllPatientList() async
   {
     // final uri = Uri.http(baseUrl, '/fetchInfo');
     // final response = await client.get(uri);

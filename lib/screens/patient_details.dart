@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medimate/bloc/events_and_states/show_patient_details_event.dart';
 import 'package:medimate/bloc/patient_bloc.dart';
+import 'package:medimate/date.dart';
 
 class PatientDetails extends StatelessWidget
 {
@@ -77,62 +78,20 @@ class PatientDetails extends StatelessWidget
   {
     final day = detailsList[index]['DOA'].toString().substring(8, 10);
 
-    final String monthString;
-    switch (detailsList[index]['DOA'].toString().substring(5, 7))
-    {
-      case '01': {
-        monthString = 'Jan';
-      } break;
-      case '02': {
-        monthString = 'Feb';
-      } break;
-      case '03': {
-        monthString = 'March';
-      } break;
-      case '04': {
-        monthString = 'April';
-      } break;
-      case '05': {
-        monthString = 'May';
-      } break;
-      case '06': {
-        monthString = 'June';
-      } break;
-      case '07': {
-        monthString = 'July';
-      } break;
-      case '08': {
-        monthString = 'Aug';
-      } break;
-      case '09': {
-        monthString = 'Sep';
-      } break;
-      case '10': {
-        monthString = 'Oct';
-      } break;
-      case '11': {
-        monthString = 'Nov';
-      } break;
-      case '12': {
-        monthString = 'Dec';
-      } break;
-      default: {
-        monthString = '';
-      }
-    }
+    String month = Date().setMonth(int.parse(detailsList[index]['DOA'].toString().substring(5, 7)));
 
-    final date = '$day $monthString';
+    final date = '$day $month';
 
     return Padding
       (
-      padding: const EdgeInsets.fromLTRB(15, 8, 15, 8),
+      padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
       child: Row
         (
         children:
         [
           Container
             (
-            height: 100,
+            height: 102,
             alignment: Alignment.center,
             padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 5),
             decoration: ShapeDecoration

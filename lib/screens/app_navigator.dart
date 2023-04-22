@@ -33,6 +33,8 @@ class AppNavigator extends StatelessWidget
           previousAllPatientListState = patientBloc.state;
         }
 
+        print(routeName);
+
         return Navigator
           (
           pages:
@@ -65,13 +67,18 @@ class AppNavigator extends StatelessWidget
           ],
           onPopPage: (route, result)
           {
+            final navCubit = BlocProvider.of<NavCubit>(context);
+
             if (route.settings.name == '/addPatient' || route.settings.name == '/allPatientList')
             {
+              print('Yes');
               patientBloc.add(PopToRecentPatientListEvent(previousDashboardState!));
+              navCubit.navigateTo('/dashboard');
             }
             if (route.settings.name == '/patientDetails')
             {
               patientBloc.add(PopToAllPatientListEvent(previousAllPatientListState!));
+              navCubit.navigateTo('/allPatientList');
             }
 
             return route.didPop(result);

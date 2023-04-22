@@ -9,19 +9,13 @@ import 'package:medimate/screens/app_navigator.dart';
 
 void main()
 {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
-class MyApp extends StatefulWidget
+class MyApp extends StatelessWidget
 {
-  const MyApp({Key? key}) : super(key: key);
+  MyApp({Key? key}) : super(key: key);
 
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp>
-{
   final CustomTheme _customTheme = CustomTheme();
 
   @override
@@ -44,7 +38,7 @@ class _MyAppState extends State<MyApp>
               (
                 providers:
                 [
-                  BlocProvider(create: (context) => PatientBloc()..add(LoadRecentPatientListEvent())),
+                  BlocProvider(create: (context) => PatientBloc()..add(LoadRecentPatientListEvent(DateTime.now().toString()))),
                   BlocProvider(create: (context) => NavCubit())
                 ],
                 child: const AppNavigator()

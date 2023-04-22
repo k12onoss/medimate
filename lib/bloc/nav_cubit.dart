@@ -9,10 +9,5 @@ class NavCubit extends Cubit<String?>
 
   NavCubit() : super('/dashboard');
 
-  void navigateTo(String routeName)
-  {
-    emit(routeName);
-  }
-
-  void goBack() => emit(null);
+  void navigateTo(String routeName) {emit(routeName);}
 }

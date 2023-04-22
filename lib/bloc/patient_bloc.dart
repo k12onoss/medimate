@@ -29,18 +29,11 @@ class PatientBloc extends Bloc<PatientEvent, PatientState>
 
           try
           {
-            final allPatientList = await _patientRepository.getPatientList();
-            List recentPatientList = [], recentPatientDetailsList = [], recentPatientPresList = [];
-
-            allPatientList[0].map((e) => e['DOA'] == '2023-04-13T00:00:00.000Z' ? recentPatientDetailsList.add(e): 0);
-            allPatientList[1].map((e) => e['DOA'] == '2023-04-13T00:00:00.000Z' ? recentPatientPresList.add(e): 0);
-            recentPatientList.add(recentPatientDetailsList);
-            recentPatientList.add(recentPatientPresList);
-
-            print(recentPatientList);
+            final allPatientList = await _patientRepository.getAllPatientList();
+            List recentPatientList = await _patientRepository.getRecentPatientList(event.date);
 
             // emit (LoadRecentPatientListSuccessState(recentPatientList));
-            emit(LoadRecentPatientListSuccessState(allPatientList));
+            emit(LoadRecentPatientListSuccessState(allPatientList, event.date));
           }
           catch (e)
           {
@@ -53,7 +46,7 @@ class PatientBloc extends Bloc<PatientEvent, PatientState>
 
           try
           {
-            final allPatientList = await _patientRepository.getPatientList();
+            final allPatientList = await _patientRepository.getAllPatientList();
             emit (LoadAllPatientListSuccessState(allPatientList));
           }
           catch (e)

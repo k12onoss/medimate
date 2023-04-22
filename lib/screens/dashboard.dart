@@ -6,6 +6,7 @@ import 'package:medimate/bloc/nav_cubit.dart';
 import 'package:medimate/bloc/events_and_states/enter_patient_details_event.dart';
 import 'package:medimate/bloc/events_and_states/load_all_patient_list_event.dart';
 import 'package:medimate/bloc/theme_cubit.dart';
+import 'package:medimate/date.dart';
 
 class Dashboard extends StatelessWidget
 {
@@ -26,8 +27,14 @@ class Dashboard extends StatelessWidget
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children:
               [
-                // _datePicker(context),
-                _topCard(context),
+                Row
+                  (
+                  children:
+                  [
+                    if (state is LoadRecentPatientListSuccessState) _datePicker(context, state.date),
+                    Expanded(child: _topCard(context)),
+                  ],
+                ),
                 const SizedBox(height: 10,),
                 if (state is LoadingRecentPatientListState) const Center(child: CircularProgressIndicator(),)
                 else if(state is LoadRecentPatientListSuccessState) _appointmentsList(state.list)
@@ -58,7 +65,7 @@ class Dashboard extends StatelessWidget
               BlocProvider.of<ThemeCubit>(context).toggleTheme();
             },
             icon: themeMode == ThemeMode.system
-                ? const Icon(Icons.auto_mode)
+                ? const Icon(Icons.brightness_auto)
                 : (themeMode == ThemeMode.light
                 ? const Icon(Icons.light_mode) : const Icon(Icons.nights_stay)),
           ),
@@ -67,15 +74,65 @@ class Dashboard extends StatelessWidget
     );
   }
 
-  Widget _datePicker(BuildContext context)
+  Widget _datePicker(BuildContext context, String date)
   {
-    return IconButton
+    String month = Date().setMonth(int.parse(date.substring(5, 7)));
+    DateTime? selectedDate;
+
+    return Padding
       (
+      padding: const EdgeInsets.fromLTRB(10, 10, 7, 10),
+      child: TextButton
+        (
         onPressed: () async
         {
-          await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime(2020), lastDate: DateTime(2025));
+          selectedDate = await showDatePicker
+            (
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(2000),
+            lastDate: DateTime.now()
+          );
+
+          if (selectedDate != null && selectedDate.toString() != date && context.mounted)
+          {
+            BlocProvider.of<PatientBloc>(context).add(LoadRecentPatientListEvent(selectedDate.toString()));
+          }
         },
-        icon: const Icon(Icons.calendar_month)
+        style: ButtonStyle
+          (
+          backgroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.primary),
+          fixedSize: MaterialStateProperty.all(const Size(85, 85)),
+          shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)))
+        ),
+        child: Column
+          (
+          mainAxisAlignment: MainAxisAlignment.center,
+          children:
+          [
+            Text
+              (
+              date.substring(8, 10),
+              style: TextStyle
+                (
+                color: Theme.of(context).scaffoldBackgroundColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 30
+              )
+            ),
+            Text
+              (
+              month.toLowerCase(),
+              style: TextStyle
+                (
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15
+              )
+            )
+          ],
+        ),
+      ),
     );
   }
 
@@ -85,7 +142,7 @@ class Dashboard extends StatelessWidget
 
     return Padding
       (
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.fromLTRB(7, 10, 10, 10),
       child: Card
         (
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -102,7 +159,7 @@ class Dashboard extends StatelessWidget
           ),
           title: const Text
             (
-            'Patients visited',
+            'Patients \nVisited',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           trailing: state is LoadRecentPatientListSuccessState ? Text(state.list[0].length.toString()): null,
@@ -156,14 +213,10 @@ class Dashboard extends StatelessWidget
   {
     return Padding
       (
-      padding: const EdgeInsets.fromLTRB(15, 8, 15, 8),
+      padding: const EdgeInsets.fromLTRB(10, 7, 10, 7),
       child: GestureDetector
         (
-        onTap: ()
-        {
-        // BlocProvider.of<PatientBloc>(context).add(ShowPatientDetailsEvent());
-        // BlocProvider.of<NavCubit>(context).showPatientDetails();
-        },
+        onTap: () {},
         child:Card
           (
           child: ListTile

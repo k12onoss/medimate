@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medimate/bloc/events_and_states/load_all_patient_list_event.dart';
 import 'package:medimate/bloc/events_and_states/search_patient_event.dart';
-import 'package:medimate/bloc/events_and_states/load_recent_patient_list_event.dart';
 import 'package:medimate/bloc/events_and_states/show_patient_details_event.dart';
 import 'package:medimate/bloc/nav_cubit.dart';
 import 'package:medimate/bloc/patient_bloc.dart';
@@ -177,8 +176,7 @@ class AllPatientList extends StatelessWidget
       {
         if (index == 0)
         {
-          BlocProvider.of<PatientBloc>(context).add(LoadRecentPatientListEvent());
-          BlocProvider.of<NavCubit>(context).goBack();
+          Navigator.pop(context);
         }
       },
     );

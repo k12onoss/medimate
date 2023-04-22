@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medimate/bloc/events_and_states/add_new_patient_event.dart';
 import 'package:medimate/bloc/events_and_states/enter_patient_details_event.dart';
 import 'package:medimate/bloc/patient_bloc.dart';
-import 'package:medimate/bloc/nav_cubit.dart';
 
 class AddPatient extends StatelessWidget
 {
@@ -59,7 +58,7 @@ class AddPatient extends StatelessWidget
             }
             else if (state is AddNewPatientSuccessState)
             {
-              BlocProvider.of<NavCubit>(context).goBack();
+              Navigator.pop(context);
             }
             else if (state is AddNewPatientFailState)
             {
