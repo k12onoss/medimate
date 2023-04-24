@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medimate/bloc/events_and_states/add_new_patient_event.dart';
 import 'package:medimate/bloc/events_and_states/enter_patient_details_event.dart';
 import 'package:medimate/bloc/patient_bloc.dart';
+import 'package:medimate/router_delegate.dart';
+import 'package:get/get.dart';
 
 class AddPatient extends StatelessWidget
 {
@@ -58,7 +60,8 @@ class AddPatient extends StatelessWidget
             }
             else if (state is AddNewPatientSuccessState)
             {
-              Navigator.pop(context);
+              final routerDelegate = Get.find<MyRouterDelegate>();
+              routerDelegate.popRoute();
             }
             else if (state is AddNewPatientFailState)
             {

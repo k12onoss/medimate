@@ -3,8 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medimate/bloc/events_and_states/load_all_patient_list_event.dart';
 import 'package:medimate/bloc/events_and_states/search_patient_event.dart';
 import 'package:medimate/bloc/events_and_states/show_patient_details_event.dart';
-import 'package:medimate/bloc/nav_cubit.dart';
 import 'package:medimate/bloc/patient_bloc.dart';
+import 'package:medimate/router_delegate.dart';
+import 'package:get/get.dart';
 
 class AllPatientList extends StatelessWidget
 {
@@ -125,7 +126,8 @@ class AllPatientList extends StatelessWidget
       onTap: ()
       {
         BlocProvider.of<PatientBloc>(context).add(ShowPatientDetailsEvent(name, contact));
-        BlocProvider.of<NavCubit>(context).navigateTo('/patientDetails');
+        final routerDelegate = Get.find<MyRouterDelegate>();
+        routerDelegate.pushPage('/patientDetails');
       },
       child: Card
         (
@@ -176,7 +178,8 @@ class AllPatientList extends StatelessWidget
       {
         if (index == 0)
         {
-          Navigator.pop(context);
+          final routerDelegate = Get.find<MyRouterDelegate>();
+          routerDelegate.popRoute();
         }
       },
     );

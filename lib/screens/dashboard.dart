@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medimate/bloc/events_and_states/load_recent_patient_list_event.dart';
 import 'package:medimate/bloc/patient_bloc.dart';
-import 'package:medimate/bloc/nav_cubit.dart';
 import 'package:medimate/bloc/events_and_states/enter_patient_details_event.dart';
 import 'package:medimate/bloc/events_and_states/load_all_patient_list_event.dart';
 import 'package:medimate/bloc/theme_cubit.dart';
 import 'package:medimate/date.dart';
+import 'package:medimate/router_delegate.dart';
+import 'package:get/get.dart';
 
 class Dashboard extends StatelessWidget
 {
@@ -77,7 +78,7 @@ class Dashboard extends StatelessWidget
   Widget _datePicker(BuildContext context, String date)
   {
     String month = Date().setMonth(int.parse(date.substring(5, 7)));
-    DateTime? selectedDate;
+    DateTime? selectedDate = DateTime.tryParse(date);
 
     return Padding
       (
@@ -89,9 +90,9 @@ class Dashboard extends StatelessWidget
           selectedDate = await showDatePicker
             (
             context: context,
-            initialDate: DateTime.now(),
+            initialDate: selectedDate!,
             firstDate: DateTime(2000),
-            lastDate: DateTime.now()
+            lastDate: DateTime.now(),
           );
 
           if (selectedDate != null && selectedDate.toString() != date && context.mounted)
@@ -148,15 +149,6 @@ class Dashboard extends StatelessWidget
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         child: ListTile
           (
-          leading: CircleAvatar
-            (
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            child: Icon
-              (
-              Icons.person,
-              color: Theme.of(context).scaffoldBackgroundColor,
-            )
-          ),
           title: const Text
             (
             'Patients \nVisited',
@@ -176,23 +168,28 @@ class Dashboard extends StatelessWidget
         (
         children:
         [
-          Row
+          const Text
             (
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children:
-            const [
-              Text
-                (
-                'Recent appointments',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
-              Text
-                (
-                'See all',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              )
-            ],
+            'Recent visits',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
+          // Row
+          //   (
+          //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+          //   children:
+          //   const [
+          //     Text
+          //       (
+          //       'Recent appointments',
+          //       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          //     ),
+          //     Text
+          //       (
+          //       'See all',
+          //       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          //     )
+          //   ],
+          // ),
           Expanded
             (
             child: ListView.builder
@@ -244,9 +241,9 @@ class Dashboard extends StatelessWidget
       (
       onPressed: ()
       {
-        final patientBloc = BlocProvider.of<PatientBloc>(context);
-        BlocProvider.of<NavCubit>(context).navigateTo('/addPatient');
-        patientBloc.add(EnterPatientDetailsEvent());
+        final routerDelegate = Get.find<MyRouterDelegate>();
+        routerDelegate.pushPage('/addPatient');
+        BlocProvider.of<PatientBloc>(context).add(EnterPatientDetailsEvent());
       },
       child: const Icon(Icons.add),);
   }
@@ -279,7 +276,8 @@ class Dashboard extends StatelessWidget
         if (index == 1)
           {
             BlocProvider.of<PatientBloc>(context).add(LoadAllPatientListEvent());
-            BlocProvider.of<NavCubit>(context).navigateTo('/allPatientList');
+            final routerDelegate = Get.find<MyRouterDelegate>();
+            routerDelegate.pushPage('/allPatientList');
           }
       },
     );

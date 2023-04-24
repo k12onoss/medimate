@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:medimate/bloc/events_and_states/load_recent_patient_list_event.dart';
-import 'package:medimate/bloc/nav_cubit.dart';
 import 'package:medimate/bloc/patient_bloc.dart';
 import 'package:medimate/bloc/theme_cubit.dart';
 import 'package:medimate/custom_theme.dart';
-import 'package:medimate/screens/app_navigator.dart';
+import 'package:medimate/router_delegate.dart';
 
 void main()
 {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget
 {
-  MyApp({Key? key}) : super(key: key);
-
-  final CustomTheme _customTheme = CustomTheme();
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context)
   {
+    final routerDelegate = Get.put(MyRouterDelegate());
+
     return BlocProvider
       (
       create: (context) => ThemeCubit(),
@@ -28,20 +28,20 @@ class MyApp extends StatelessWidget
         (
         builder: (context, mode)
         {
+          final CustomTheme customTheme = CustomTheme();
           return MaterialApp
             (
             themeMode: mode,
-            theme: _customTheme.lightTheme(),
-            darkTheme: _customTheme.darkTheme(),
+            theme: customTheme.lightTheme(),
+            darkTheme: customTheme.darkTheme(),
 
             home: MultiBlocProvider
               (
                 providers:
                 [
-                  BlocProvider(create: (context) => PatientBloc()..add(LoadRecentPatientListEvent(DateTime.now().toString()))),
-                  BlocProvider(create: (context) => NavCubit())
+                  BlocProvider<PatientBloc>(create: (context) => PatientBloc()..add(LoadRecentPatientListEvent(DateTime.now().toString()))),
                 ],
-                child: const AppNavigator()
+                child: Router(routerDelegate: routerDelegate, backButtonDispatcher: RootBackButtonDispatcher())
             ),
           );
         },
