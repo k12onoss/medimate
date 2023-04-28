@@ -2,12 +2,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medimate/bloc/events_and_states/load_recent_patient_list_event.dart';
 import 'package:medimate/bloc/events_and_states/load_all_patient_list_event.dart';
 import 'package:medimate/bloc/events_and_states/pop_to_all_patient_list_event.dart';
+import 'package:medimate/bloc/events_and_states/pop_to_patient_details_event.dart';
 import 'package:medimate/bloc/events_and_states/search_patient_event.dart';
 import 'package:medimate/bloc/events_and_states/add_new_patient_event.dart';
 import 'package:medimate/bloc/events_and_states/enter_patient_details_event.dart';
 import 'package:medimate/bloc/events_and_states/show_patient_details_event.dart';
 import 'package:medimate/bloc/events_and_states/pop_to_recent_patient_list_event.dart';
-import 'package:medimate/patient_repository.dart';
+import 'package:medimate/bloc/events_and_states/show_visit_details_event.dart';
+import 'package:medimate/bloc/events_and_states/updating_visit_details_event.dart';
+import 'package:medimate/data/patient_repository.dart';
+import 'package:medimate/data/visits.dart';
 
 abstract class PatientEvent {}
 
@@ -29,11 +33,9 @@ class PatientBloc extends Bloc<PatientEvent, PatientState>
 
           try
           {
-            final allPatientList = await _patientRepository.getAllPatientList();
-            List recentPatientList = await _patientRepository.getRecentPatientList(event.date);
+            List<Visits> recentPatientList = await _patientRepository.getRecentPatientList(event.date.substring(0, 10));
 
-            // emit (LoadRecentPatientListSuccessState(recentPatientList));
-            emit(LoadRecentPatientListSuccessState(allPatientList, event.date));
+            emit (LoadRecentPatientListSuccessState(recentPatientList, event.date));
           }
           catch (e)
           {
@@ -46,7 +48,7 @@ class PatientBloc extends Bloc<PatientEvent, PatientState>
 
           try
           {
-            final allPatientList = await _patientRepository.getAllPatientList();
+            List<Visits> allPatientList = await _patientRepository.getAllPatientList();
             emit (LoadAllPatientListSuccessState(allPatientList));
           }
           catch (e)
@@ -60,7 +62,7 @@ class PatientBloc extends Bloc<PatientEvent, PatientState>
 
           try
           {
-            List patientsList = await _patientRepository.searchPatient(event.name);
+            List<Visits> patientsList = await _patientRepository.searchPatient(event.name);
             emit(SearchPatientSuccessState(patientsList));
           }
           catch (e)
@@ -78,7 +80,7 @@ class PatientBloc extends Bloc<PatientEvent, PatientState>
 
           try
           {
-            await _patientRepository.addPatient(event.patientDetails);
+            await _patientRepository.addPatient(event.visitDetails);
             emit(AddNewPatientSuccessState());
           }
           catch (e)
@@ -108,6 +110,28 @@ class PatientBloc extends Bloc<PatientEvent, PatientState>
         {
           emit(event.state);
         }
+        else if (event is ShowVisitDetailsEvent)
+        {
+          emit (ShowingVisitDetailsState(event.visit));
+        }
+        else if (event is PopToPatientDetailsEvent)
+        {
+          emit (event.state);
+        }
+        else if (event is UpdateVisitDetailsEvent)
+          {
+            emit(UpdatingVisitState());
+
+            try
+            {
+              await _patientRepository.updatePatient(event.visit);
+              emit(UpdateVisitSuccessState(event.visit['name'], event.visit['contact']));
+            }
+            catch (e)
+            {
+              emit(UpdateVisitFailState(e));
+            }
+          }
       }
     );
   }

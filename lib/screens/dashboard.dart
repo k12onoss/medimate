@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:medimate/bloc/events_and_states/load_recent_patient_list_event.dart';
 import 'package:medimate/bloc/patient_bloc.dart';
 import 'package:medimate/bloc/events_and_states/enter_patient_details_event.dart';
 import 'package:medimate/bloc/events_and_states/load_all_patient_list_event.dart';
+import 'package:medimate/bloc/events_and_states/load_recent_patient_list_event.dart';
+import 'package:medimate/bloc/events_and_states/show_visit_details_event.dart';
 import 'package:medimate/bloc/theme_cubit.dart';
-import 'package:medimate/date.dart';
-import 'package:medimate/router_delegate.dart';
-import 'package:get/get.dart';
+import 'package:medimate/data/date.dart';
+import 'package:medimate/models/router_delegate.dart';
 
 class Dashboard extends StatelessWidget
 {
@@ -38,8 +38,10 @@ class Dashboard extends StatelessWidget
                 ),
                 const SizedBox(height: 10,),
                 if (state is LoadingRecentPatientListState) const Center(child: CircularProgressIndicator(),)
-                else if(state is LoadRecentPatientListSuccessState) _appointmentsList(state.list)
+                else if(state is LoadRecentPatientListSuccessState && state.list.isNotEmpty) _appointmentsList(state.list)
+                else if (state is LoadRecentPatientListSuccessState) const Center(child: Text("No visits yet!"),)
                 else if (state is LoadRecentPatientListFailState) Center(child: Text('${state.error}'),)
+                // else if (state is AddNewPatientSuccessState) BlocProvider.of<PatientBloc>(context).add(LoadRecentPatientListEvent(DateTime.now().toString()))
               ]
             );
           },
@@ -90,7 +92,7 @@ class Dashboard extends StatelessWidget
           selectedDate = await showDatePicker
             (
             context: context,
-            initialDate: selectedDate!,
+            initialDate: DateTime.parse(date),
             firstDate: DateTime(2000),
             lastDate: DateTime.now(),
           );
@@ -154,7 +156,7 @@ class Dashboard extends StatelessWidget
             'Patients \nVisited',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          trailing: state is LoadRecentPatientListSuccessState ? Text(state.list[0].length.toString()): null,
+          trailing: state is LoadRecentPatientListSuccessState ? (state.list.isNotEmpty ? Text(state.list.length.toString()): const Text('0')): null,
         )
       ),
     );
@@ -173,28 +175,11 @@ class Dashboard extends StatelessWidget
             'Recent visits',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
           ),
-          // Row
-          //   (
-          //   mainAxisAlignment: MainAxisAlignment.spaceAround,
-          //   children:
-          //   const [
-          //     Text
-          //       (
-          //       'Recent appointments',
-          //       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-          //     ),
-          //     Text
-          //       (
-          //       'See all',
-          //       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-          //     )
-          //   ],
-          // ),
           Expanded
             (
             child: ListView.builder
               (
-              itemCount: patientList[0].length,
+              itemCount: patientList.length,
               itemBuilder: (context, index)
               {
                 return _appointmentsCard(patientList, index, context);
@@ -213,19 +198,23 @@ class Dashboard extends StatelessWidget
       padding: const EdgeInsets.fromLTRB(10, 7, 10, 7),
       child: GestureDetector
         (
-        onTap: () {},
+        onTap: ()
+        {
+          BlocProvider.of<PatientBloc>(context).add(ShowVisitDetailsEvent(patientList[index]));
+          MyRouterDelegate.find().pushPage('/visitDetails');
+        },
         child:Card
           (
           child: ListTile
             (
             title: Text
               (
-              patientList[0][index]['name'],
+              patientList[index].name,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             subtitle: Text
               (
-              patientList[0][index]['illness'],
+              patientList[index].illness,
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             trailing: const Icon(Icons.arrow_forward_ios, size: 15,),
@@ -241,8 +230,7 @@ class Dashboard extends StatelessWidget
       (
       onPressed: ()
       {
-        final routerDelegate = Get.find<MyRouterDelegate>();
-        routerDelegate.pushPage('/addPatient');
+        MyRouterDelegate.find().pushPage('/addPatient');
         BlocProvider.of<PatientBloc>(context).add(EnterPatientDetailsEvent());
       },
       child: const Icon(Icons.add),);
@@ -274,11 +262,10 @@ class Dashboard extends StatelessWidget
       onTap: (index)
       {
         if (index == 1)
-          {
-            BlocProvider.of<PatientBloc>(context).add(LoadAllPatientListEvent());
-            final routerDelegate = Get.find<MyRouterDelegate>();
-            routerDelegate.pushPage('/allPatientList');
-          }
+        {
+          BlocProvider.of<PatientBloc>(context).add(LoadAllPatientListEvent());
+          MyRouterDelegate.find().pushPage('/allPatientList');
+        }
       },
     );
   }

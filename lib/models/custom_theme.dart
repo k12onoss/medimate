@@ -53,6 +53,12 @@ class CustomTheme
         showSelectedLabels: false,
         showUnselectedLabels: false
       ),
+      dialogTheme: DialogTheme
+        (
+        backgroundColor: const Color.fromRGBO(240, 240, 240, 1),
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))
+      )
     );
   }
 
@@ -103,6 +109,12 @@ class CustomTheme
         selectedItemColor: Color.fromRGBO(181, 133, 251, 1),
         showSelectedLabels: true,
         showUnselectedLabels: false
+      ),
+      dialogTheme: DialogTheme
+        (
+          backgroundColor: const Color.fromRGBO(27, 26, 26, 1),
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))
       ),
     );
   }

@@ -4,8 +4,7 @@ import 'package:medimate/bloc/events_and_states/load_all_patient_list_event.dart
 import 'package:medimate/bloc/events_and_states/search_patient_event.dart';
 import 'package:medimate/bloc/events_and_states/show_patient_details_event.dart';
 import 'package:medimate/bloc/patient_bloc.dart';
-import 'package:medimate/router_delegate.dart';
-import 'package:get/get.dart';
+import 'package:medimate/models/router_delegate.dart';
 
 class AllPatientList extends StatelessWidget
 {
@@ -107,7 +106,7 @@ class AllPatientList extends StatelessWidget
           crossAxisSpacing: 10,
           mainAxisSpacing: 10
         ),
-        itemCount: patientList[0].length,
+        itemCount: patientList.length,
         itemBuilder: (context, index)
         {
           return _patientCard(patientList, index, context);
@@ -118,15 +117,15 @@ class AllPatientList extends StatelessWidget
 
   Widget _patientCard(List patientList, int index, BuildContext context)
   {
-    String name = patientList[0][index]['name'];
-    String contact = patientList[0][index]['contact'];
+    String name = patientList[index].name;
+    String contact = patientList[index].contact;
 
     return GestureDetector
       (
       onTap: ()
       {
         BlocProvider.of<PatientBloc>(context).add(ShowPatientDetailsEvent(name, contact));
-        final routerDelegate = Get.find<MyRouterDelegate>();
+        final routerDelegate = MyRouterDelegate.find();
         routerDelegate.pushPage('/patientDetails');
       },
       child: Card
@@ -134,15 +133,17 @@ class AllPatientList extends StatelessWidget
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         child: ListTile
           (
+          isThreeLine: true,
           title: Text
             (
             name,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            maxLines: 1,
           ),
           subtitle: Text
             (
             contact,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
           ),
           trailing: const Icon(Icons.arrow_forward_ios, size: 15,),
         ),
@@ -178,7 +179,7 @@ class AllPatientList extends StatelessWidget
       {
         if (index == 0)
         {
-          final routerDelegate = Get.find<MyRouterDelegate>();
+          final routerDelegate = MyRouterDelegate.find();
           routerDelegate.popRoute();
         }
       },

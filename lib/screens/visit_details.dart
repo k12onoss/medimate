@@ -1,19 +1,18 @@
 import 'package:country_dial_code/country_dial_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:medimate/bloc/events_and_states/add_new_patient_event.dart';
-import 'package:medimate/bloc/events_and_states/enter_patient_details_event.dart';
-import 'package:medimate/bloc/events_and_states/load_recent_patient_list_event.dart';
+import 'package:medimate/bloc/events_and_states/show_visit_details_event.dart';
+import 'package:medimate/bloc/events_and_states/updating_visit_details_event.dart';
 import 'package:medimate/bloc/patient_bloc.dart';
 import 'package:medimate/models/router_delegate.dart';
 
-class AddPatient extends StatelessWidget
+class VisitDetails extends StatelessWidget
 {
   final _formKey = GlobalKey<FormState>();
   final _parameters = ['name', 'contact', 'age', 'illness', 'prescription', 'period', 'DOA', 'fee'];
-  final _visitDetails = {};
+  late final Map _visitDetails;
 
-  AddPatient({Key? key}) : super(key: key);
+  VisitDetails({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context)
@@ -22,42 +21,54 @@ class AddPatient extends StatelessWidget
       (
       appBar: AppBar
         (
-        title: const Text('Add patient'),
+        title: const Text('Visit Details'),
       ),
       body: BlocBuilder<PatientBloc, PatientState>
         (
           builder: (context, state)
           {
-            if (state is EnteringPatientDetailsState)
+            if (state is ShowingVisitDetailsState)
             {
+              final visit = state.visit;
+              _visitDetails =
+              {
+                'name': visit.name,
+                'contact': visit.contact,
+                'age': visit.age,
+                'illness': visit.illness,
+                'prescription': visit.prescription,
+                'period': visit.period,
+                'DOA': visit.DOA.substring(0, 10),
+                'fee': visit.fee
+              };
               return _form(context);
             }
-            else if (state is AddingNewPatientState)
+            else if (state is UpdatingVisitState)
             {
               return const Center(child: CircularProgressIndicator(),);
             }
-            else if (state is AddNewPatientSuccessState)
+            else if (state is UpdateVisitSuccessState)
             {
               return AlertDialog
                 (
-                title: const Text('Visit added successfully!'),
+                title: const Text('Visit updated successfully!'),
                 actions:
                 [
                   TextButton
                     (
-                    onPressed: ()
-                    {
-                      MyRouterDelegate.find().popRoute();
-                      BlocProvider.of<PatientBloc>(context).add(LoadRecentPatientListEvent(DateTime.now().toString()));
-                    },
-                    child: const Text('Great!')
+                      onPressed: ()
+                      {
+                        MyRouterDelegate.find().popRoute();
+                        // BlocProvider.of<PatientBloc>(context).add(ShowPatientDetailsEvent(_visitDetails['name'], _visitDetails['contact']));
+                      },
+                      child: const Text('Great!')
                   )
                 ],
               );
             }
-            else if (state is AddNewPatientFailState)
+            else if (state is UpdateVisitFailState)
             {
-              return Center(child: Text('Adding new visit failed with the following error:\n${state.error}'),);
+              return Center(child: Text('${state.error}'),);
             }
             return Container();
           }
@@ -69,43 +80,42 @@ class AddPatient extends StatelessWidget
   {
     return Form
       (
-      key: _formKey,
-      child: SizedBox
-        (
-        height: 550,
-        child: Column
+        key: _formKey,
+        child: SizedBox
           (
-          mainAxisAlignment: MainAxisAlignment.center,
-          children:
-          [
-            Expanded
-              (
-              child: ListView.builder
+          height: 550,
+          child: Column
+            (
+            mainAxisAlignment: MainAxisAlignment.center,
+            children:
+            [
+              Expanded
                 (
-                itemCount: _parameters.length,
-                itemBuilder: (context, index)
-                {
-                  return _formFields(index, context);
-                }
+                child: ListView.builder
+                  (
+                    itemCount: _parameters.length,
+                    itemBuilder: (context, index)
+                    {
+                      return _formFields(index, context);
+                    }
+                ),
               ),
-            ),
-            ElevatedButton
-              (
-              onPressed: ()
-              {
-               if (_formKey.currentState!.validate())
-               {
-                 _formKey.currentState?.save();
-                 BlocProvider.of<PatientBloc>(context).add(AddNewPatientEvent(_visitDetails));
-                 // MyRouterDelegate.find().popRoute();
-               }
-              },
-              child: const Text('Enter')
-            ),
-            // const SizedBox (height: 100)
-          ],
-        ),
-      )
+              ElevatedButton
+                (
+                  onPressed: ()
+                  {
+                    if (_formKey.currentState!.validate())
+                    {
+                      _formKey.currentState?.save();
+                      BlocProvider.of<PatientBloc>(context).add(UpdateVisitDetailsEvent(_visitDetails));
+                    }
+                  },
+                  child: const Text('Update')
+              ),
+              // const SizedBox (height: 100)
+            ],
+          ),
+        )
     );
   }
 
@@ -136,17 +146,14 @@ class AddPatient extends StatelessWidget
       Icon(Icons.currency_rupee)
     ];
 
-    // final List<Locale> systemLocales = WidgetsBinding.instance.window.locales;
-    // print(systemLocales);
-    // String? isCountryCode = systemLocales.first.countryCode;
-
     return Padding
       (
       padding: const EdgeInsets.fromLTRB(15.0, 8, 15, 8),
       child: TextFormField
         (
-        initialValue: label == 'DOA' ? DateTime.now().toString().substring(0, 10): null,
+        initialValue: _visitDetails[parameter].toString(),
         textCapitalization: TextCapitalization.words,
+        readOnly: index == 0 || index == 1 ? true : false,
         decoration: InputDecoration
           (
           labelText: label,
@@ -158,17 +165,20 @@ class AddPatient extends StatelessWidget
           constraints: const BoxConstraints(maxHeight: 45),
           focusedBorder: OutlineInputBorder
             (
-            borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 3),
-            borderRadius: BorderRadius.circular(14)
+              borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 3),
+              borderRadius: BorderRadius.circular(14)
           ),
           enabledBorder: OutlineInputBorder
             (
-            borderSide: BorderSide(color: Theme.of(context).cardTheme.color!),
-            borderRadius: BorderRadius.circular(14)
+              borderSide: BorderSide(color: Theme.of(context).cardTheme.color!),
+              borderRadius: BorderRadius.circular(14)
           ),
         ),
         validator: (value) => value!.isEmpty ? 'Please enter some text': null,
-        onSaved: (value) => _visitDetails.putIfAbsent(parameter, () => value),
+        onSaved: (value)
+        {
+          _visitDetails.update(parameter, (value) => value);
+        },
         textInputAction: index == _parameters.length - 1 ? TextInputAction.done : TextInputAction.next,
         keyboardType: keyboardTypes[index],
       ),

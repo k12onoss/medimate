@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
 import 'package:medimate/bloc/events_and_states/load_recent_patient_list_event.dart';
 import 'package:medimate/bloc/patient_bloc.dart';
 import 'package:medimate/bloc/theme_cubit.dart';
-import 'package:medimate/custom_theme.dart';
-import 'package:medimate/router_delegate.dart';
+import 'package:medimate/models/custom_theme.dart';
+import 'package:medimate/models/router_delegate.dart';
 
 void main()
 {
@@ -19,7 +18,8 @@ class MyApp extends StatelessWidget
   @override
   Widget build(BuildContext context)
   {
-    final routerDelegate = Get.put(MyRouterDelegate());
+    final routerDelegate = MyRouterDelegate();
+    MyRouterDelegate.put(routerDelegate);
 
     return BlocProvider
       (

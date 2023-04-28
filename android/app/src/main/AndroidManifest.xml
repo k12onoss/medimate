@@ -1,7 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.medimate">
+    package="com.example.medimate"
+    android:versionCode="1"
+    android:versionName="1">
+    <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="medimate"
+        android:label="MediMate"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

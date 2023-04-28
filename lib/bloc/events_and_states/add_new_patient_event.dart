@@ -2,9 +2,9 @@ import 'package:medimate/bloc/patient_bloc.dart';
 
 class AddNewPatientEvent extends PatientEvent
 {
-  Map patientDetails;
+  Map visitDetails;
 
-  AddNewPatientEvent(this.patientDetails);
+  AddNewPatientEvent(this.visitDetails);
 }
 
 class AddingNewPatientState extends PatientState {}
