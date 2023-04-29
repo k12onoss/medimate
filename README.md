@@ -23,5 +23,5 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 
 Special thanks to the following individuals for their contribution to the project:
 
-- Hitt Bahal (@Hitt-1004) for the backend development.
+- Hitt Bahal ([@Hitt-1004](github.com/Hitt-1004)) for the backend development.
 - Swetha Balamurugan for the UI/UX and logo design.
