@@ -178,7 +178,6 @@ class AddPatient extends StatelessWidget
   Widget _dropdownMenuButton()
   {
     final countryLocales = WidgetsBinding.instance.window.locales;
-    countryLocales.add(const Locale('in', 'IN'));
     final dropDownItems = List.generate(countryLocales.length, (index) => DropdownMenuItem(value: CountryDialCode.fromCountryCode(countryLocales[index].countryCode!).dialCode, child: Text(CountryDialCode.fromCountryCode(countryLocales[index].countryCode!).dialCode)));
     String? initialValue = CountryDialCode.fromCountryCode(countryLocales.first.countryCode!).dialCode;
 
