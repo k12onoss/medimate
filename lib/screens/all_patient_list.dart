@@ -4,10 +4,11 @@ import 'package:medimate/bloc/events_and_states/load_all_patient_list_event.dart
 import 'package:medimate/bloc/events_and_states/search_patient_event.dart';
 import 'package:medimate/bloc/events_and_states/show_patient_details_event.dart';
 import 'package:medimate/bloc/patient_bloc.dart';
+import 'package:medimate/data/visits.dart';
 import 'package:medimate/models/router_delegate.dart';
 
 class AllPatientList extends StatelessWidget {
-  const AllPatientList({Key? key}) : super(key: key);
+  const AllPatientList({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -65,26 +66,31 @@ class AllPatientList extends StatelessWidget {
           fillColor: Theme.of(context).cardTheme.color,
           constraints: const BoxConstraints(maxHeight: 45),
           focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(
-                  color: Theme.of(context).colorScheme.primary, width: 3),
-              borderRadius: BorderRadius.circular(25)),
+            borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary,
+              width: 3,
+            ),
+            borderRadius: BorderRadius.circular(25),
+          ),
           enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Theme.of(context).cardTheme.color!),
-              borderRadius: BorderRadius.circular(25)),
+            borderSide: BorderSide(color: Theme.of(context).cardTheme.color!),
+            borderRadius: BorderRadius.circular(25),
+          ),
         ),
       ),
     );
   }
 
-  Widget _patientGrid(List patientList) {
+  Widget _patientGrid(List<Visits> patientList) {
     return Expanded(
       child: GridView.builder(
         padding: const EdgeInsets.all(8),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 2,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10),
+          crossAxisCount: 2,
+          childAspectRatio: 1.75,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+        ),
         itemCount: patientList.length,
         itemBuilder: (context, index) {
           return _patientCard(patientList, index, context);
@@ -93,9 +99,13 @@ class AllPatientList extends StatelessWidget {
     );
   }
 
-  Widget _patientCard(List patientList, int index, BuildContext context) {
-    String name = patientList[index].name;
-    String contact = patientList[index].contact;
+  Widget _patientCard(
+    List<Visits> patientList,
+    int index,
+    BuildContext context,
+  ) {
+    final String name = patientList[index].name;
+    final String contact = patientList[index].contact;
 
     return GestureDetector(
       onTap: () {
@@ -116,6 +126,7 @@ class AllPatientList extends StatelessWidget {
           subtitle: Text(
             contact,
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            softWrap: false,
           ),
           trailing: const Icon(
             Icons.arrow_forward_ios,
@@ -132,23 +143,25 @@ class AllPatientList extends StatelessWidget {
       currentIndex: 1,
       items: [
         const BottomNavigationBarItem(
-            icon: Icon(Icons.home), label: 'Dashboard'),
+          icon: Icon(Icons.home),
+          label: 'Dashboard',
+        ),
         BottomNavigationBarItem(
-            icon: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.list_rounded),
-                const SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  'All patients',
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.primary),
-                ),
-              ],
-            ),
-            label: 'All patients')
+          icon: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.list_rounded),
+              const SizedBox(
+                width: 5,
+              ),
+              Text(
+                'All patients',
+                style: TextStyle(color: Theme.of(context).colorScheme.primary),
+              ),
+            ],
+          ),
+          label: 'All patients',
+        )
       ],
       onTap: (index) {
         if (index == 0) {

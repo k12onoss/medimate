@@ -11,7 +11,7 @@ class AddingNewPatientState extends PatientState {}
 class AddNewPatientSuccessState extends PatientState {}
 
 class AddNewPatientFailState extends PatientState {
-  final error;
+  final Error error;
 
   AddNewPatientFailState(this.error);
 }

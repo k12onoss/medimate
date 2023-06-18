@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:medimate/bloc/events_and_states/pop_to_all_patient_list_event.dart';
 import 'package:medimate/bloc/events_and_states/pop_to_patient_details_event.dart';
+import 'package:medimate/bloc/events_and_states/pop_to_recent_patient_list_event.dart';
+import 'package:medimate/bloc/patient_bloc.dart';
 import 'package:medimate/screens/add_patient.dart';
 import 'package:medimate/screens/all_patient_list.dart';
 import 'package:medimate/screens/dashboard.dart';
 import 'package:medimate/screens/patient_details.dart';
-import 'package:medimate/bloc/events_and_states/pop_to_all_patient_list_event.dart';
-import 'package:medimate/bloc/events_and_states/pop_to_recent_patient_list_event.dart';
-import 'package:medimate/bloc/patient_bloc.dart';
 import 'package:medimate/screens/visit_details.dart';
 
 class MyRouterDelegate extends RouterDelegate<List<RouteSettings>>
@@ -16,14 +16,17 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>>
   GlobalKey<NavigatorState>? navigatorKey = GlobalKey<NavigatorState>();
   final _pages = <Page>[
     const MaterialPage(
-        child: Dashboard(), key: ValueKey('/dashboard'), name: '/dashboard'),
+      child: Dashboard(),
+      key: ValueKey('/dashboard'),
+      name: '/dashboard',
+    ),
   ];
-  PatientState? _previousDashboardState;
-  PatientState? _previousAllPatientListState;
-  PatientState? _previousPatientDetailsState;
+  late PatientState? _previousDashboardState;
+  late PatientState? _previousAllPatientListState;
+  late PatientState? _previousPatientDetailsState;
   String? _pageThatPushedVisitDetails;
 
-  static MyRouterDelegate? _myRouterDelegate;
+  static late MyRouterDelegate? _myRouterDelegate;
 
   static void put(MyRouterDelegate myRouterDelegate) {
     _myRouterDelegate = myRouterDelegate;
@@ -35,7 +38,7 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>>
 
   void pushPage(String routeName) {
     Widget child;
-    PatientBloc patientBloc =
+    final PatientBloc patientBloc =
         BlocProvider.of<PatientBloc>(navigatorKey!.currentContext!);
 
     switch (routeName) {
@@ -60,10 +63,12 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>>
       case '/visitDetails':
         {
           _pageThatPushedVisitDetails = _pages.last.name;
-          if (_pageThatPushedVisitDetails == '/dashboard')
+          if (_pageThatPushedVisitDetails == '/dashboard') {
             _previousDashboardState = patientBloc.state;
-          if (_pageThatPushedVisitDetails == '/patientDetails')
+          }
+          if (_pageThatPushedVisitDetails == '/patientDetails') {
             _previousPatientDetailsState = patientBloc.state;
+          }
           child = VisitDetails();
         }
         break;
@@ -73,11 +78,13 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>>
         }
     }
 
-    _pages.add(MaterialPage(
-      child: child,
-      key: ValueKey(routeName),
-      name: routeName,
-    ));
+    _pages.add(
+      MaterialPage(
+        child: child,
+        key: ValueKey(routeName),
+        name: routeName,
+      ),
+    );
 
     notifyListeners();
   }
@@ -85,8 +92,8 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>>
   @override
   Future<bool> popRoute() {
     if (_pages.length > 1) {
-      Page poppedPage = _pages.removeLast();
-      PatientBloc patientBloc =
+      final Page poppedPage = _pages.removeLast();
+      final PatientBloc patientBloc =
           BlocProvider.of<PatientBloc>(navigatorKey!.currentContext!);
 
       if (poppedPage.name == '/addPatient' ||

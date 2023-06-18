@@ -5,9 +5,17 @@ class Visits {
   String illness;
   String prescription;
   String period;
-  String DOA;
+  String doa;
   int fee;
 
-  Visits(this.name, this.contact, this.age, this.illness, this.prescription,
-      this.period, this.DOA, this.fee);
+  Visits(
+    this.name,
+    this.contact,
+    this.age,
+    this.illness,
+    this.prescription,
+    this.period,
+    this.doa,
+    this.fee,
+  );
 }

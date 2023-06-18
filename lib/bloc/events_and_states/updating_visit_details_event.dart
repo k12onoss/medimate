@@ -1,7 +1,7 @@
 import 'package:medimate/bloc/patient_bloc.dart';
 
 class UpdateVisitDetailsEvent extends PatientEvent {
-  Map visit;
+  Map<String, dynamic> visit;
 
   UpdateVisitDetailsEvent(this.visit);
 }
@@ -16,7 +16,7 @@ class UpdateVisitSuccessState extends PatientState {
 }
 
 class UpdateVisitFailState extends PatientState {
-  final error;
+  final Error error;
 
   UpdateVisitFailState(this.error);
 }
