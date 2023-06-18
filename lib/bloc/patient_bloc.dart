@@ -17,122 +17,83 @@ abstract class PatientEvent {}
 
 abstract class PatientState {}
 
-class PatientBloc extends Bloc<PatientEvent, PatientState>
-{
+class PatientBloc extends Bloc<PatientEvent, PatientState> {
   final _patientRepository = PatientRepository();
 
-  PatientBloc(): super(LoadingRecentPatientListState())
-  {
-    on
-      (
-      (event, emit) async
-      {
-        if (event is LoadRecentPatientListEvent)
-        {
-          emit(LoadingRecentPatientListState());
+  PatientBloc() : super(LoadingRecentPatientListState()) {
+    on((event, emit) async {
+      if (event is LoadRecentPatientListEvent) {
+        emit(LoadingRecentPatientListState());
 
-          try
-          {
-            List<Visits> recentPatientList = await _patientRepository.getRecentPatientList(event.date.substring(0, 10));
+        try {
+          List<Visits> recentPatientList = await _patientRepository
+              .getRecentPatientList(event.date.substring(0, 10));
 
-            emit (LoadRecentPatientListSuccessState(recentPatientList, event.date));
-          }
-          catch (e)
-          {
-            emit(LoadRecentPatientListFailState(e));
-          }
+          emit(
+              LoadRecentPatientListSuccessState(recentPatientList, event.date));
+        } catch (e) {
+          emit(LoadRecentPatientListFailState(e));
         }
-        else if (event is LoadAllPatientListEvent)
-        {
-          emit(LoadingAllPatientListState());
+      } else if (event is LoadAllPatientListEvent) {
+        emit(LoadingAllPatientListState());
 
-          try
-          {
-            List<Visits> allPatientList = await _patientRepository.getAllPatientList();
-            emit (LoadAllPatientListSuccessState(allPatientList));
-          }
-          catch (e)
-          {
-            emit(LoadAllPatientListFailState(e));
-          }
+        try {
+          List<Visits> allPatientList =
+              await _patientRepository.getAllPatientList();
+          emit(LoadAllPatientListSuccessState(allPatientList));
+        } catch (e) {
+          emit(LoadAllPatientListFailState(e));
         }
-        else if (event is SearchPatientEvent)
-        {
-          emit (SearchingPatientState());
+      } else if (event is SearchPatientEvent) {
+        emit(SearchingPatientState());
 
-          try
-          {
-            List<Visits> patientsList = await _patientRepository.searchPatient(event.name);
-            emit(SearchPatientSuccessState(patientsList));
-          }
-          catch (e)
-          {
-            emit(SearchPatientFailState(e));
-          }
+        try {
+          List<Visits> patientsList =
+              await _patientRepository.searchPatient(event.name);
+          emit(SearchPatientSuccessState(patientsList));
+        } catch (e) {
+          emit(SearchPatientFailState(e));
         }
-        else if (event is EnterPatientDetailsEvent)
-        {
-          emit(EnteringPatientDetailsState());
-        }
-        else if (event is AddNewPatientEvent)
-        {
-          emit(AddingNewPatientState());
+      } else if (event is EnterPatientDetailsEvent) {
+        emit(EnteringPatientDetailsState());
+      } else if (event is AddNewPatientEvent) {
+        emit(AddingNewPatientState());
 
-          try
-          {
-            await _patientRepository.addPatient(event.visitDetails);
-            emit(AddNewPatientSuccessState());
-          }
-          catch (e)
-          {
-            emit(AddNewPatientFailState(e));
-          }
+        try {
+          await _patientRepository.addPatient(event.visitDetails);
+          emit(AddNewPatientSuccessState());
+        } catch (e) {
+          emit(AddNewPatientFailState(e));
         }
-        else if (event is ShowPatientDetailsEvent)
-        {
-          emit(LoadingPatientDetailsListState());
+      } else if (event is ShowPatientDetailsEvent) {
+        emit(LoadingPatientDetailsListState());
 
-          try
-          {
-            List patientDetails = await _patientRepository.getPatientHistory(event.name, event.contact);
-            emit(LoadPatientDetailsListSuccessState(patientDetails));
-          }
-          catch (e)
-          {
-            emit(LoadPatientDetailsListFailState(e));
-          }
+        try {
+          List patientDetails = await _patientRepository.getPatientHistory(
+              event.name, event.contact);
+          emit(LoadPatientDetailsListSuccessState(patientDetails));
+        } catch (e) {
+          emit(LoadPatientDetailsListFailState(e));
         }
-        else if (event is PopToRecentPatientListEvent)
-        {
-          emit(event.state);
-        }
-        else if (event is PopToAllPatientListEvent)
-        {
-          emit(event.state);
-        }
-        else if (event is ShowVisitDetailsEvent)
-        {
-          emit (ShowingVisitDetailsState(event.visit));
-        }
-        else if (event is PopToPatientDetailsEvent)
-        {
-          emit (event.state);
-        }
-        else if (event is UpdateVisitDetailsEvent)
-          {
-            emit(UpdatingVisitState());
+      } else if (event is PopToRecentPatientListEvent) {
+        emit(event.state);
+      } else if (event is PopToAllPatientListEvent) {
+        emit(event.state);
+      } else if (event is ShowVisitDetailsEvent) {
+        emit(ShowingVisitDetailsState(event.visit));
+      } else if (event is PopToPatientDetailsEvent) {
+        emit(event.state);
+      } else if (event is UpdateVisitDetailsEvent) {
+        emit(UpdatingVisitState());
 
-            try
-            {
-              await _patientRepository.updatePatient(event.visit);
-              emit(UpdateVisitSuccessState(event.visit['name'], event.visit['contact']));
-            }
-            catch (e)
-            {
-              emit(UpdateVisitFailState(e));
-            }
-          }
+        try {
+          await _patientRepository.updatePatient(event.visit);
+          emit(UpdateVisitSuccessState(
+              event.visit['name'], event.visit['contact']));
+        } catch (e) {
+          emit(UpdateVisitFailState(e));
+        }
       }
-    );
+    });
   }
 }

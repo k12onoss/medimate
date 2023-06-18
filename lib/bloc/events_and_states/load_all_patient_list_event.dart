@@ -4,15 +4,13 @@ class LoadAllPatientListEvent extends PatientEvent {}
 
 class LoadingAllPatientListState extends PatientState {}
 
-class LoadAllPatientListSuccessState extends PatientState
-{
+class LoadAllPatientListSuccessState extends PatientState {
   final List list;
 
-  LoadAllPatientListSuccessState (this.list);
+  LoadAllPatientListSuccessState(this.list);
 }
 
-class LoadAllPatientListFailState extends PatientState
-{
+class LoadAllPatientListFailState extends PatientState {
   final error;
 
   LoadAllPatientListFailState(this.error);

@@ -1,7 +1,6 @@
 import 'package:medimate/bloc/patient_bloc.dart';
 
-class ShowPatientDetailsEvent extends PatientEvent
-{
+class ShowPatientDetailsEvent extends PatientEvent {
   String name;
   String contact;
 
@@ -10,21 +9,18 @@ class ShowPatientDetailsEvent extends PatientEvent
 
 class LoadingPatientDetailsListState extends PatientState {}
 
-class LoadPatientDetailsListSuccessState extends PatientState
-{
+class LoadPatientDetailsListSuccessState extends PatientState {
   final List patientDetailsList;
 
-  LoadPatientDetailsListSuccessState (this.patientDetailsList);
+  LoadPatientDetailsListSuccessState(this.patientDetailsList);
 }
 
-class LoadPatientDetailsListFailState extends PatientState
-{
+class LoadPatientDetailsListFailState extends PatientState {
   final error;
 
-  LoadPatientDetailsListFailState (this.error);
+  LoadPatientDetailsListFailState(this.error);
 }
 
-class ClearPatientDetailsListState extends PatientState
-{
+class ClearPatientDetailsListState extends PatientState {
   final list = [];
 }

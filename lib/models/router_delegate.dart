@@ -10,18 +10,13 @@ import 'package:medimate/bloc/events_and_states/pop_to_recent_patient_list_event
 import 'package:medimate/bloc/patient_bloc.dart';
 import 'package:medimate/screens/visit_details.dart';
 
-class MyRouterDelegate extends RouterDelegate<List<RouteSettings>> with ChangeNotifier, PopNavigatorRouterDelegateMixin<List<RouteSettings>>
-{
+class MyRouterDelegate extends RouterDelegate<List<RouteSettings>>
+    with ChangeNotifier, PopNavigatorRouterDelegateMixin<List<RouteSettings>> {
   @override
   GlobalKey<NavigatorState>? navigatorKey = GlobalKey<NavigatorState>();
-  final _pages = <Page>
-  [
-    const MaterialPage
-      (
-        child: Dashboard(),
-        key: ValueKey('/dashboard'),
-        name: '/dashboard'
-    ),
+  final _pages = <Page>[
+    const MaterialPage(
+        child: Dashboard(), key: ValueKey('/dashboard'), name: '/dashboard'),
   ];
   PatientState? _previousDashboardState;
   PatientState? _previousAllPatientListState;
@@ -30,23 +25,20 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>> with ChangeNo
 
   static MyRouterDelegate? _myRouterDelegate;
 
-  static void put(MyRouterDelegate myRouterDelegate)
-  {
+  static void put(MyRouterDelegate myRouterDelegate) {
     _myRouterDelegate = myRouterDelegate;
   }
 
-  static MyRouterDelegate find()
-  {
+  static MyRouterDelegate find() {
     return _myRouterDelegate!;
   }
 
-  void pushPage(String routeName)
-  {
+  void pushPage(String routeName) {
     Widget child;
-    PatientBloc patientBloc = BlocProvider.of<PatientBloc>(navigatorKey!.currentContext!);
+    PatientBloc patientBloc =
+        BlocProvider.of<PatientBloc>(navigatorKey!.currentContext!);
 
-    switch (routeName)
-    {
+    switch (routeName) {
       case '/addPatient':
         {
           _previousDashboardState = patientBloc.state;
@@ -68,8 +60,10 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>> with ChangeNo
       case '/visitDetails':
         {
           _pageThatPushedVisitDetails = _pages.last.name;
-          if (_pageThatPushedVisitDetails == '/dashboard') _previousDashboardState = patientBloc.state;
-          if (_pageThatPushedVisitDetails == '/patientDetails') _previousPatientDetailsState = patientBloc.state;
+          if (_pageThatPushedVisitDetails == '/dashboard')
+            _previousDashboardState = patientBloc.state;
+          if (_pageThatPushedVisitDetails == '/patientDetails')
+            _previousPatientDetailsState = patientBloc.state;
           child = VisitDetails();
         }
         break;
@@ -79,38 +73,36 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>> with ChangeNo
         }
     }
 
-    _pages.add
-      (
-        MaterialPage
-          (
-          child: child,
-          key: ValueKey(routeName),
-          name: routeName,
-        )
-    );
+    _pages.add(MaterialPage(
+      child: child,
+      key: ValueKey(routeName),
+      name: routeName,
+    ));
 
     notifyListeners();
   }
 
   @override
-  Future<bool> popRoute()
-  {
-    if (_pages.length > 1)
-    {
+  Future<bool> popRoute() {
+    if (_pages.length > 1) {
       Page poppedPage = _pages.removeLast();
-      PatientBloc patientBloc = BlocProvider.of<PatientBloc>(navigatorKey!.currentContext!);
+      PatientBloc patientBloc =
+          BlocProvider.of<PatientBloc>(navigatorKey!.currentContext!);
 
-      if (poppedPage.name == '/addPatient' || poppedPage.name == '/allPatientList' || (poppedPage.name == '/visitDetails' && _pageThatPushedVisitDetails == '/dashboard'))
-      {
+      if (poppedPage.name == '/addPatient' ||
+          poppedPage.name == '/allPatientList' ||
+          (poppedPage.name == '/visitDetails' &&
+              _pageThatPushedVisitDetails == '/dashboard')) {
         patientBloc.add(PopToRecentPatientListEvent(_previousDashboardState!));
       }
-      if (poppedPage.name == '/patientDetails')
-      {
-        patientBloc.add(PopToAllPatientListEvent(_previousAllPatientListState!));
+      if (poppedPage.name == '/patientDetails') {
+        patientBloc
+            .add(PopToAllPatientListEvent(_previousAllPatientListState!));
       }
-      if (poppedPage.name == '/visitDetails' && _pageThatPushedVisitDetails == '/patientDetails')
-      {
-        patientBloc.add(PopToPatientDetailsEvent(_previousPatientDetailsState!));
+      if (poppedPage.name == '/visitDetails' &&
+          _pageThatPushedVisitDetails == '/patientDetails') {
+        patientBloc
+            .add(PopToPatientDetailsEvent(_previousPatientDetailsState!));
       }
 
       notifyListeners();
@@ -119,8 +111,7 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>> with ChangeNo
     return Future.value(false);
   }
 
-  bool _onPopPage(Route route, dynamic result)
-  {
+  bool _onPopPage(Route route, dynamic result) {
     if (!route.didPop(result)) return false;
 
     popRoute();
@@ -131,13 +122,11 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>> with ChangeNo
   Future<void> setNewRoutePath(List<RouteSettings> configuration) async {}
 
   @override
-  Widget build(BuildContext context)
-  {
-    return Navigator
-      (
+  Widget build(BuildContext context) {
+    return Navigator(
       key: navigatorKey,
       pages: List.of(_pages),
       onPopPage: _onPopPage,
     );
   }
- }
+}

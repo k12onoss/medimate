@@ -1,5 +1,4 @@
-class Visits
-{
+class Visits {
   String name;
   String contact;
   int age;
@@ -9,5 +8,6 @@ class Visits
   String DOA;
   int fee;
 
-  Visits(this.name, this.contact, this.age, this.illness, this.prescription, this.period, this.DOA, this.fee);
+  Visits(this.name, this.contact, this.age, this.illness, this.prescription,
+      this.period, this.DOA, this.fee);
 }

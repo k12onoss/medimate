@@ -1,7 +1,6 @@
 import 'package:medimate/bloc/patient_bloc.dart';
 
-class SearchPatientEvent extends PatientEvent
-{
+class SearchPatientEvent extends PatientEvent {
   String name;
 
   SearchPatientEvent(this.name);
@@ -9,16 +8,14 @@ class SearchPatientEvent extends PatientEvent
 
 class SearchingPatientState extends PatientState {}
 
-class SearchPatientSuccessState extends PatientState
-{
+class SearchPatientSuccessState extends PatientState {
   final List patients;
 
   SearchPatientSuccessState(this.patients);
 }
 
-class SearchPatientFailState extends PatientState
-{
+class SearchPatientFailState extends PatientState {
   final error;
 
-  SearchPatientFailState (this.error);
+  SearchPatientFailState(this.error);
 }
