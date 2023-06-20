@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medimate/bloc/events_and_states/enter_patient_details_event.dart';
-import 'package:medimate/bloc/events_and_states/load_all_patient_list_event.dart';
 import 'package:medimate/bloc/events_and_states/load_recent_patient_list_event.dart';
 import 'package:medimate/bloc/events_and_states/show_visit_details_event.dart';
 import 'package:medimate/bloc/patient_bloc.dart';
@@ -53,8 +52,6 @@ class Dashboard extends StatelessWidget {
         },
       ),
       floatingActionButton: _floatingActionButton(context),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: _bottomNavigationBar(context),
     );
   }
 
@@ -145,7 +142,7 @@ class Dashboard extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         child: ListTile(
           title: const Text(
-            'Patients \nVisited',
+            'Patients Visited',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           trailing: state is LoadRecentPatientListSuccessState
@@ -153,6 +150,10 @@ class Dashboard extends StatelessWidget {
                   ? Text(state.list.length.toString())
                   : const Text('0'))
               : null,
+          leadingAndTrailingTextStyle: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
@@ -219,40 +220,6 @@ class Dashboard extends StatelessWidget {
         BlocProvider.of<PatientBloc>(context).add(EnterPatientDetailsEvent());
       },
       child: const Icon(Icons.add),
-    );
-  }
-
-  Widget _bottomNavigationBar(BuildContext context) {
-    return BottomNavigationBar(
-      showSelectedLabels: false,
-      items: [
-        BottomNavigationBarItem(
-          icon: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.home_filled),
-              const SizedBox(
-                width: 5,
-              ),
-              Text(
-                'Home',
-                style: TextStyle(color: Theme.of(context).colorScheme.primary),
-              ),
-            ],
-          ),
-          label: 'Dashboard',
-        ),
-        const BottomNavigationBarItem(
-          icon: Icon(Icons.list_rounded),
-          label: 'All patients',
-        )
-      ],
-      onTap: (index) {
-        if (index == 1) {
-          BlocProvider.of<PatientBloc>(context).add(LoadAllPatientListEvent());
-          MyRouterDelegate.find().pushPage('/allPatientList');
-        }
-      },
     );
   }
 }

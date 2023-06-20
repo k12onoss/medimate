@@ -44,7 +44,6 @@ class AllPatientList extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: _bottomNavigationBar(context),
     );
   }
 
@@ -134,41 +133,6 @@ class AllPatientList extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _bottomNavigationBar(BuildContext context) {
-    return BottomNavigationBar(
-      showSelectedLabels: false,
-      currentIndex: 1,
-      items: [
-        const BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Dashboard',
-        ),
-        BottomNavigationBarItem(
-          icon: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.list_rounded),
-              const SizedBox(
-                width: 5,
-              ),
-              Text(
-                'All patients',
-                style: TextStyle(color: Theme.of(context).colorScheme.primary),
-              ),
-            ],
-          ),
-          label: 'All patients',
-        )
-      ],
-      onTap: (index) {
-        if (index == 0) {
-          final routerDelegate = MyRouterDelegate.find();
-          routerDelegate.popRoute();
-        }
-      },
     );
   }
 }

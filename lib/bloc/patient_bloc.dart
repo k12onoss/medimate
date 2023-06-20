@@ -3,9 +3,7 @@ import 'package:medimate/bloc/events_and_states/add_new_patient_event.dart';
 import 'package:medimate/bloc/events_and_states/enter_patient_details_event.dart';
 import 'package:medimate/bloc/events_and_states/load_all_patient_list_event.dart';
 import 'package:medimate/bloc/events_and_states/load_recent_patient_list_event.dart';
-import 'package:medimate/bloc/events_and_states/pop_to_all_patient_list_event.dart';
-import 'package:medimate/bloc/events_and_states/pop_to_patient_details_event.dart';
-import 'package:medimate/bloc/events_and_states/pop_to_recent_patient_list_event.dart';
+import 'package:medimate/bloc/events_and_states/restore_previous_state_event.dart';
 import 'package:medimate/bloc/events_and_states/search_patient_event.dart';
 import 'package:medimate/bloc/events_and_states/show_patient_details_event.dart';
 import 'package:medimate/bloc/events_and_states/show_visit_details_event.dart';
@@ -79,14 +77,10 @@ class PatientBloc extends Bloc<PatientEvent, PatientState> {
         } catch (error) {
           emit(LoadPatientDetailsListFailState(error as Error));
         }
-      } else if (event is PopToRecentPatientListEvent) {
-        emit(event.state);
-      } else if (event is PopToAllPatientListEvent) {
+      } else if (event is RestorePreviousStateEvent) {
         emit(event.state);
       } else if (event is ShowVisitDetailsEvent) {
         emit(ShowingVisitDetailsState(event.visit));
-      } else if (event is PopToPatientDetailsEvent) {
-        emit(event.state);
       } else if (event is UpdateVisitDetailsEvent) {
         emit(UpdatingVisitState());
 

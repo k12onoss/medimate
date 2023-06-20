@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:medimate/bloc/events_and_states/pop_to_all_patient_list_event.dart';
-import 'package:medimate/bloc/events_and_states/pop_to_patient_details_event.dart';
-import 'package:medimate/bloc/events_and_states/pop_to_recent_patient_list_event.dart';
+import 'package:medimate/bloc/events_and_states/restore_previous_state_event.dart';
 import 'package:medimate/bloc/patient_bloc.dart';
 import 'package:medimate/screens/add_patient.dart';
-import 'package:medimate/screens/all_patient_list.dart';
-import 'package:medimate/screens/dashboard.dart';
+import 'package:medimate/screens/home.dart';
 import 'package:medimate/screens/patient_details.dart';
 import 'package:medimate/screens/visit_details.dart';
 
@@ -15,14 +12,13 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>>
   @override
   GlobalKey<NavigatorState>? navigatorKey = GlobalKey<NavigatorState>();
   final _pages = <Page>[
-    const MaterialPage(
-      child: Dashboard(),
-      key: ValueKey('/dashboard'),
-      name: '/dashboard',
+    MaterialPage(
+      child: Home(),
+      key: const ValueKey('/home'),
+      name: '/home',
     ),
   ];
-  late PatientState? _previousDashboardState;
-  late PatientState? _previousAllPatientListState;
+  late PatientState? _previousHomeState;
   late PatientState? _previousPatientDetailsState;
   String? _pageThatPushedVisitDetails;
 
@@ -44,27 +40,21 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>>
     switch (routeName) {
       case '/addPatient':
         {
-          _previousDashboardState = patientBloc.state;
+          _previousHomeState = patientBloc.state;
           child = AddPatient();
-        }
-        break;
-      case '/allPatientList':
-        {
-          _previousDashboardState = patientBloc.state;
-          child = const AllPatientList();
         }
         break;
       case '/patientDetails':
         {
-          _previousAllPatientListState = patientBloc.state;
+          _previousHomeState = patientBloc.state;
           child = const PatientDetails();
         }
         break;
       case '/visitDetails':
         {
           _pageThatPushedVisitDetails = _pages.last.name;
-          if (_pageThatPushedVisitDetails == '/dashboard') {
-            _previousDashboardState = patientBloc.state;
+          if (_pageThatPushedVisitDetails == '/home') {
+            _previousHomeState = patientBloc.state;
           }
           if (_pageThatPushedVisitDetails == '/patientDetails') {
             _previousPatientDetailsState = patientBloc.state;
@@ -74,7 +64,7 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>>
         break;
       default:
         {
-          child = const Dashboard();
+          child = Home();
         }
     }
 
@@ -97,19 +87,17 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>>
           BlocProvider.of<PatientBloc>(navigatorKey!.currentContext!);
 
       if (poppedPage.name == '/addPatient' ||
-          poppedPage.name == '/allPatientList' ||
           (poppedPage.name == '/visitDetails' &&
-              _pageThatPushedVisitDetails == '/dashboard')) {
-        patientBloc.add(PopToRecentPatientListEvent(_previousDashboardState!));
+              _pageThatPushedVisitDetails == '/home')) {
+        patientBloc.add(RestorePreviousStateEvent(_previousHomeState!));
       }
       if (poppedPage.name == '/patientDetails') {
-        patientBloc
-            .add(PopToAllPatientListEvent(_previousAllPatientListState!));
+        patientBloc.add(RestorePreviousStateEvent(_previousHomeState!));
       }
       if (poppedPage.name == '/visitDetails' &&
           _pageThatPushedVisitDetails == '/patientDetails') {
         patientBloc
-            .add(PopToPatientDetailsEvent(_previousPatientDetailsState!));
+            .add(RestorePreviousStateEvent(_previousPatientDetailsState!));
       }
 
       notifyListeners();
