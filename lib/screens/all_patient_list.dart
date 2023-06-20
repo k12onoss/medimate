@@ -13,9 +13,6 @@ class AllPatientList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('All Patients'),
-      ),
       body: Column(
         children: [
           _searchBar(context),
@@ -49,33 +46,34 @@ class AllPatientList extends StatelessWidget {
 
   Widget _searchBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-      child: TextField(
-        textCapitalization: TextCapitalization.words,
-        onSubmitted: (name) =>
-            BlocProvider.of<PatientBloc>(context).add(SearchPatientEvent(name)),
-        // onChanged: (name) => BlocProvider.of<PatientBloc>(context).add(SearchPatientEvent(name)),
-        decoration: InputDecoration(
-          prefixIcon: const Icon(Icons.search),
-          prefixIconColor: Theme.of(context).colorScheme.primary,
-          label: const Text('Search'),
-          labelStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
-          hintText: 'Type the name of the patient',
-          filled: true,
-          fillColor: Theme.of(context).cardTheme.color,
-          constraints: const BoxConstraints(maxHeight: 45),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.primary,
-              width: 3,
-            ),
-            borderRadius: BorderRadius.circular(25),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Theme.of(context).cardTheme.color!),
-            borderRadius: BorderRadius.circular(25),
-          ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 8,
+      ),
+      child: SearchBar(
+        hintText: 'Search patients',
+        leading: Icon(
+          Icons.search_rounded,
+          color: Theme.of(context).colorScheme.primary,
         ),
+        elevation: MaterialStateProperty.all(0),
+        backgroundColor:
+            MaterialStateProperty.all(Theme.of(context).cardTheme.color),
+        surfaceTintColor:
+            MaterialStateProperty.all(Theme.of(context).cardTheme.color),
+        side: MaterialStateProperty.resolveWith(
+          (state) => state.contains(MaterialState.focused)
+              ? BorderSide(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 3,
+                )
+              : BorderSide(
+                  width: 3,
+                  color: Theme.of(context).cardTheme.color!,
+                ),
+        ),
+        onChanged: (name) =>
+            BlocProvider.of<PatientBloc>(context).add(SearchPatientEvent(name)),
       ),
     );
   }

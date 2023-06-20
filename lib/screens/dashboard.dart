@@ -4,7 +4,6 @@ import 'package:medimate/bloc/events_and_states/enter_patient_details_event.dart
 import 'package:medimate/bloc/events_and_states/load_recent_patient_list_event.dart';
 import 'package:medimate/bloc/events_and_states/show_visit_details_event.dart';
 import 'package:medimate/bloc/patient_bloc.dart';
-import 'package:medimate/bloc/theme_cubit.dart';
 import 'package:medimate/data/date.dart';
 import 'package:medimate/data/visits.dart';
 import 'package:medimate/models/router_delegate.dart';
@@ -15,7 +14,6 @@ class Dashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _appBar(context),
       body: BlocBuilder<PatientBloc, PatientState>(
         builder: (context, state) {
           return Column(
@@ -37,7 +35,7 @@ class Dashboard extends StatelessWidget {
                 )
               else if (state is LoadRecentPatientListSuccessState &&
                   state.list.isNotEmpty)
-                _appointmentsList(state.list)
+                _recentVisitsList(state.list)
               else if (state is LoadRecentPatientListSuccessState)
                 const Center(
                   child: Text("No visits yet!"),
@@ -46,32 +44,11 @@ class Dashboard extends StatelessWidget {
                 Center(
                   child: Text('${state.error}'),
                 )
-              // else if (state is AddNewPatientSuccessState) BlocProvider.of<PatientBloc>(context).add(LoadRecentPatientListEvent(DateTime.now().toString()))
             ],
           );
         },
       ),
       floatingActionButton: _floatingActionButton(context),
-    );
-  }
-
-  PreferredSizeWidget _appBar(BuildContext context) {
-    return AppBar(
-      title: const Text('MediMate'),
-      actions: [
-        BlocBuilder<ThemeCubit, ThemeMode>(
-          builder: (context, themeMode) => IconButton(
-            onPressed: () {
-              BlocProvider.of<ThemeCubit>(context).toggleTheme();
-            },
-            icon: themeMode == ThemeMode.system
-                ? const Icon(Icons.brightness_auto)
-                : (themeMode == ThemeMode.light
-                    ? const Icon(Icons.light_mode)
-                    : const Icon(Icons.nights_stay)),
-          ),
-        )
-      ],
     );
   }
 
@@ -159,7 +136,7 @@ class Dashboard extends StatelessWidget {
     );
   }
 
-  Widget _appointmentsList(List<Visits> patientList) {
+  Widget _recentVisitsList(List<Visits> patientList) {
     return Expanded(
       child: Column(
         children: [
@@ -171,7 +148,7 @@ class Dashboard extends StatelessWidget {
             child: ListView.builder(
               itemCount: patientList.length,
               itemBuilder: (context, index) {
-                return _appointmentsCard(patientList, index, context);
+                return _recentVisitsCard(patientList, index, context);
               },
             ),
           ),
@@ -180,7 +157,7 @@ class Dashboard extends StatelessWidget {
     );
   }
 
-  Widget _appointmentsCard(
+  Widget _recentVisitsCard(
     List<Visits> patientList,
     int index,
     BuildContext context,
@@ -197,11 +174,17 @@ class Dashboard extends StatelessWidget {
           child: ListTile(
             title: Text(
               patientList[index].name,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
             ),
             subtitle: Text(
               patientList[index].illness,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
             ),
             trailing: const Icon(
               Icons.arrow_forward_ios,
