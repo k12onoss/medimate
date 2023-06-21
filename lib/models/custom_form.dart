@@ -1,13 +1,11 @@
 import 'package:country_dial_code/country_dial_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:medimate/bloc/events_and_states/add_new_patient_event.dart';
-import 'package:medimate/bloc/events_and_states/enter_patient_details_event.dart';
-import 'package:medimate/bloc/events_and_states/load_recent_patient_list_event.dart';
+import 'package:medimate/bloc/events_and_states/add_new_visit_event.dart';
+import 'package:medimate/bloc/events_and_states/updating_visit_details_event.dart';
 import 'package:medimate/bloc/patient_bloc.dart';
-import 'package:medimate/models/router_delegate.dart';
 
-class AddPatient extends StatelessWidget {
+class CustomForm {
   final _formKey = GlobalKey<FormState>();
   final _parameters = [
     'name',
@@ -19,57 +17,19 @@ class AddPatient extends StatelessWidget {
     'DOA',
     'fee'
   ];
-  final _visitDetails = {};
+  final Map<String, dynamic> visitDetails;
+  String enterText;
 
-  AddPatient({super.key});
+  CustomForm({
+    required this.visitDetails,
+    required this.enterText,
+  });
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add patient'),
-      ),
-      body: BlocBuilder<PatientBloc, PatientState>(
-        builder: (context, state) {
-          if (state is EnteringPatientDetailsState) {
-            return _form(context);
-          } else if (state is AddingNewPatientState) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (state is AddNewPatientSuccessState) {
-            return AlertDialog(
-              title: const Text('Visit added successfully!'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    MyRouterDelegate.find().popRoute();
-                    BlocProvider.of<PatientBloc>(context).add(
-                      LoadRecentPatientListEvent(DateTime.now().toString()),
-                    );
-                  },
-                  child: const Text('Great!'),
-                )
-              ],
-            );
-          } else if (state is AddNewPatientFailState) {
-            return Center(
-              child: Text(
-                'Adding new visit failed with the following error:\n${state.error}',
-              ),
-            );
-          }
-          return Container();
-        },
-      ),
-    );
-  }
-
-  Widget _form(BuildContext context) {
+  Widget form(BuildContext context) {
     return Form(
       key: _formKey,
       child: SizedBox(
-        height: 550,
+        height: 620,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -85,14 +45,17 @@ class AddPatient extends StatelessWidget {
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState?.save();
-                  BlocProvider.of<PatientBloc>(context)
-                      .add(AddNewPatientEvent(_visitDetails));
-                  // MyRouterDelegate.find().popRoute();
+                  if (enterText == 'Add') {
+                    BlocProvider.of<PatientBloc>(context)
+                        .add(AddNewVisitEvent(visitDetails));
+                  } else if (enterText == 'Update') {
+                    BlocProvider.of<PatientBloc>(context)
+                        .add(UpdateVisitDetailsEvent(visitDetails));
+                  }
                 }
               },
-              child: const Text('Enter'),
+              child: Text(enterText),
             ),
-            // const SizedBox (height: 100)
           ],
         ),
       ),
@@ -124,16 +87,19 @@ class AddPatient extends StatelessWidget {
       Icon(Icons.currency_rupee)
     ];
 
-    // final List<Locale> systemLocales = WidgetsBinding.instance.window.locales;
-    // print(systemLocales);
-    // String? isCountryCode = systemLocales.first.countryCode;
-
     return Padding(
       padding: const EdgeInsets.fromLTRB(15.0, 8, 15, 8),
       child: TextFormField(
-        initialValue:
-            label == 'DOA' ? DateTime.now().toString().substring(0, 10) : null,
+        initialValue: enterText == 'Add'
+            ? label == 'DOA'
+                ? DateTime.now().toString().substring(0, 10)
+                : null
+            : enterText == 'Update'
+                ? visitDetails[parameter].toString()
+                : null,
+        readOnly: enterText == 'Update' && (index == 0 || index == 1),
         textCapitalization: TextCapitalization.words,
+        textAlignVertical: TextAlignVertical.center,
         decoration: InputDecoration(
           labelText: label,
           prefixIcon: icons[index],
@@ -141,7 +107,7 @@ class AddPatient extends StatelessWidget {
           prefix: parameter == 'contact' ? _dropdownMenuButton(context) : null,
           filled: true,
           fillColor: Theme.of(context).cardTheme.color,
-          constraints: const BoxConstraints(maxHeight: 45),
+          isCollapsed: true,
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(
               color: Theme.of(context).colorScheme.primary,
@@ -150,12 +116,26 @@ class AddPatient extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
           ),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Theme.of(context).cardTheme.color!),
+            borderSide: BorderSide(
+              color: Theme.of(context).cardTheme.color!,
+            ),
             borderRadius: BorderRadius.circular(14),
           ),
         ),
-        validator: (value) => value!.isEmpty ? 'Please enter some text' : null,
-        onSaved: (value) => _visitDetails.putIfAbsent(parameter, () => value),
+        validator: (value) => index == 1
+            ? value!.length < 10
+                ? 'Enter a valid phone number'
+                : null
+            : value!.isEmpty
+                ? 'This field cannot be empty'
+                : null,
+        onSaved: (value) {
+          visitDetails.update(
+            parameter,
+            (value) => value as Object,
+            ifAbsent: () => value!,
+          );
+        },
         textInputAction: index == _parameters.length - 1
             ? TextInputAction.done
             : TextInputAction.next,
@@ -179,18 +159,25 @@ class AddPatient extends StatelessWidget {
         ),
       ),
     );
-    String? initialValue =
-        CountryDialCode.fromCountryCode(countryLocales.first.countryCode!)
-            .dialCode;
+    final ValueNotifier selectedCode = ValueNotifier(
+      CountryDialCode.fromCountryCode(countryLocales.first.countryCode!)
+          .dialCode,
+    );
 
-    return DropdownButton(
-      elevation: 0,
-      value: initialValue,
-      items: dropDownItems,
-      onChanged: (value) {
-        initialValue = value;
-      },
-      icon: const Icon(Icons.arrow_drop_down),
+    return ValueListenableBuilder(
+      valueListenable: selectedCode,
+      builder: (context, code, _) => DropdownButton(
+        elevation: 0,
+        borderRadius: BorderRadius.circular(14),
+        underline: Container(),
+        dropdownColor: Theme.of(context).cardColor,
+        value: code,
+        items: dropDownItems,
+        onChanged: (value) {
+          selectedCode.value = value;
+        },
+        icon: const Icon(Icons.arrow_drop_down),
+      ),
     );
   }
 }

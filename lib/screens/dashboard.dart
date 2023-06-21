@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:medimate/bloc/events_and_states/enter_patient_details_event.dart';
 import 'package:medimate/bloc/events_and_states/load_recent_patient_list_event.dart';
-import 'package:medimate/bloc/events_and_states/show_visit_details_event.dart';
 import 'package:medimate/bloc/patient_bloc.dart';
 import 'package:medimate/data/date.dart';
 import 'package:medimate/data/visits.dart';
@@ -120,12 +118,15 @@ class Dashboard extends StatelessWidget {
         child: ListTile(
           title: const Text(
             'Patients Visited',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           trailing: state is LoadRecentPatientListSuccessState
-              ? (state.list.isNotEmpty
+              ? state.list.isNotEmpty
                   ? Text(state.list.length.toString())
-                  : const Text('0'))
+                  : const Text('0')
               : null,
           leadingAndTrailingTextStyle: const TextStyle(
             fontSize: 18,
@@ -165,11 +166,8 @@ class Dashboard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 7, 10, 7),
       child: GestureDetector(
-        onTap: () {
-          BlocProvider.of<PatientBloc>(context)
-              .add(ShowVisitDetailsEvent(patientList[index]));
-          MyRouterDelegate.find().pushPage('/visitDetails');
-        },
+        onTap: () =>
+          MyRouterDelegate.find().pushPage('/visitDetails', patientList[index]),
         child: Card(
           child: ListTile(
             title: Text(
@@ -198,10 +196,7 @@ class Dashboard extends StatelessWidget {
 
   Widget _floatingActionButton(BuildContext context) {
     return FloatingActionButton(
-      onPressed: () {
-        MyRouterDelegate.find().pushPage('/addPatient');
-        BlocProvider.of<PatientBloc>(context).add(EnterPatientDetailsEvent());
-      },
+      onPressed: () => MyRouterDelegate.find().pushPage('/addVisit'),
       child: const Icon(Icons.add),
     );
   }

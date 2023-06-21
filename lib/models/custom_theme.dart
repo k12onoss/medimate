@@ -35,6 +35,7 @@ class CustomTheme {
         iconColor: Color.fromRGBO(107, 66, 165, 1),
         contentPadding: EdgeInsets.all(15),
         style: ListTileStyle.list,
+        textColor: Colors.black,
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         foregroundColor: Color.fromRGBO(255, 255, 255, 1),
@@ -90,6 +91,7 @@ class CustomTheme {
         iconColor: Color.fromRGBO(181, 133, 251, 1),
         contentPadding: EdgeInsets.all(15),
         style: ListTileStyle.list,
+        textColor: Colors.white,
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         foregroundColor: Color.fromRGBO(0, 0, 0, 1),

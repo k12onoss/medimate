@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medimate/bloc/events_and_states/restore_previous_state_event.dart';
 import 'package:medimate/bloc/patient_bloc.dart';
-import 'package:medimate/screens/add_patient.dart';
+import 'package:medimate/screens/add_visit.dart';
 import 'package:medimate/screens/home.dart';
 import 'package:medimate/screens/patient_details.dart';
 import 'package:medimate/screens/visit_details.dart';
@@ -32,16 +32,16 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>>
     return _myRouterDelegate!;
   }
 
-  void pushPage(String routeName) {
+  void pushPage(String routeName, [Object? arguments]) {
     Widget child;
     final PatientBloc patientBloc =
         BlocProvider.of<PatientBloc>(navigatorKey!.currentContext!);
 
     switch (routeName) {
-      case '/addPatient':
+      case '/addVisit':
         {
           _previousHomeState = patientBloc.state;
-          child = AddPatient();
+          child = const AddVisit();
         }
         break;
       case '/patientDetails':
@@ -59,7 +59,7 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>>
           if (_pageThatPushedVisitDetails == '/patientDetails') {
             _previousPatientDetailsState = patientBloc.state;
           }
-          child = VisitDetails();
+          child = const VisitDetails();
         }
         break;
       default:
@@ -73,6 +73,7 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>>
         child: child,
         key: ValueKey(routeName),
         name: routeName,
+        arguments: arguments,
       ),
     );
 
@@ -86,7 +87,7 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>>
       final PatientBloc patientBloc =
           BlocProvider.of<PatientBloc>(navigatorKey!.currentContext!);
 
-      if (poppedPage.name == '/addPatient' ||
+      if (poppedPage.name == '/addVisit' ||
           (poppedPage.name == '/visitDetails' &&
               _pageThatPushedVisitDetails == '/home')) {
         patientBloc.add(RestorePreviousStateEvent(_previousHomeState!));

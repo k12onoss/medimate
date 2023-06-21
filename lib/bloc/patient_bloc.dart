@@ -1,12 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:medimate/bloc/events_and_states/add_new_patient_event.dart';
-import 'package:medimate/bloc/events_and_states/enter_patient_details_event.dart';
+import 'package:medimate/bloc/events_and_states/add_new_visit_event.dart';
 import 'package:medimate/bloc/events_and_states/load_all_patient_list_event.dart';
 import 'package:medimate/bloc/events_and_states/load_recent_patient_list_event.dart';
 import 'package:medimate/bloc/events_and_states/restore_previous_state_event.dart';
 import 'package:medimate/bloc/events_and_states/search_patient_event.dart';
 import 'package:medimate/bloc/events_and_states/show_patient_details_event.dart';
-import 'package:medimate/bloc/events_and_states/show_visit_details_event.dart';
 import 'package:medimate/bloc/events_and_states/updating_visit_details_event.dart';
 import 'package:medimate/data/patient_repository.dart';
 import 'package:medimate/data/visits.dart';
@@ -53,16 +51,14 @@ class PatientBloc extends Bloc<PatientEvent, PatientState> {
         } catch (error) {
           emit(SearchPatientFailState(error as Error));
         }
-      } else if (event is EnterPatientDetailsEvent) {
-        emit(EnteringPatientDetailsState());
-      } else if (event is AddNewPatientEvent) {
-        emit(AddingNewPatientState());
+      } else if (event is AddNewVisitEvent) {
+        emit(AddingNewVisitState());
 
         try {
           await _patientRepository.addPatient(event.visitDetails);
-          emit(AddNewPatientSuccessState());
+          emit(AddNewVisitSuccessState());
         } catch (error) {
-          emit(AddNewPatientFailState(error as Error));
+          emit(AddNewVisitFailState(error as Error));
         }
       } else if (event is ShowPatientDetailsEvent) {
         emit(LoadingPatientDetailsListState());
@@ -79,8 +75,6 @@ class PatientBloc extends Bloc<PatientEvent, PatientState> {
         }
       } else if (event is RestorePreviousStateEvent) {
         emit(event.state);
-      } else if (event is ShowVisitDetailsEvent) {
-        emit(ShowingVisitDetailsState(event.visit));
       } else if (event is UpdateVisitDetailsEvent) {
         emit(UpdatingVisitState());
 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medimate/bloc/events_and_states/show_patient_details_event.dart';
-import 'package:medimate/bloc/events_and_states/show_visit_details_event.dart';
 import 'package:medimate/bloc/patient_bloc.dart';
 import 'package:medimate/data/date.dart';
 import 'package:medimate/data/visits.dart';
@@ -87,12 +86,8 @@ class PatientDetails extends StatelessWidget {
     final date = '$day $month';
 
     return GestureDetector(
-      onTap: () {
-        BlocProvider.of<PatientBloc>(context)
-            .add(ShowVisitDetailsEvent(detailsList[index]));
-        final routerDelegate = MyRouterDelegate.find();
-        routerDelegate.pushPage('/visitDetails');
-      },
+      onTap: () =>
+        MyRouterDelegate.find().pushPage('/visitDetails', detailsList[index]),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
         child: Row(
