@@ -10,10 +10,7 @@ MediMate is a clinic management and record keeping app built using Flutter. It a
 
 ## Screenshots
 
-![dashboard_dark](screenshots/dashboard_dark.png?raw=true) ![dashboard_light](screenshots/dashboard_light.png?raw=true)
-![all_patients_dark](screenshots/all_patients_dark.png?raw=true) ![all_patients_light](screenshots/all_patients_light.png?raw=true)
-![patient_details_dark](screenshots/patient_details_dark.png?raw=true) ![patient_details_light](screenshots/patient_details_light.png?raw=true)
-![add_visit_dark](screenshots/add_visit_dark.png?raw=true) ![add_visit_light](screenshots/add_visit_light.png?raw=true)
+<img src="https://github.com/k12onoss/medimate/blob/main/screenshots/dashboard_dark.png?raw=true" width="49%"> <img src="https://github.com/k12onoss/medimate/blob/main/screenshots/dashboard_light.png?raw=true" width="49%"> <img src="https://github.com/k12onoss/medimate/blob/main/screenshots/all_patients_dark.png?raw=true" width="49%"> <img src="https://github.com/k12onoss/medimate/blob/main/screenshots/all_patients_light.png?raw=true" width="49%"> <img src="https://github.com/k12onoss/medimate/blob/main/screenshots/patient_details_dark.png?raw=true" width="49%"> <img src="https://github.com/k12onoss/medimate/blob/main/screenshots/patient_details_light.png?raw=true" width="49%"> <img src="https://github.com/k12onoss/medimate/blob/main/screenshots/add_visit_dark.png?raw=true" width="49%"> <img src="https://github.com/k12onoss/medimate/blob/main/screenshots/add_visit_light.png?raw=true" width="49%">
 
 ## Installation
 
