@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:medimate/bloc/events_and_states/load_all_patient_list_event.dart';
-import 'package:medimate/bloc/events_and_states/restore_previous_state_event.dart';
-import 'package:medimate/bloc/patient_bloc.dart';
+
+import 'package:medimate/bloc/all_patients_bloc.dart';
+import 'package:medimate/bloc/dashboard_bloc.dart';
 import 'package:medimate/bloc/theme_cubit.dart';
-import 'package:medimate/screens/all_patient_list.dart';
-import 'package:medimate/screens/dashboard.dart';
+import 'package:medimate/screens/all_patients_view.dart';
+import 'package:medimate/screens/dashboard_view.dart';
 
 class Home extends StatelessWidget {
   final PageController _pageController = PageController();
@@ -15,24 +15,20 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    PatientState? dashboardState;
-    PatientState? allPatientListState;
+    AllPatientsState? allPatientsState;
+    DashboardState? dashboardState;
 
     void changePage(int index) {
       _currentIndex.value = index;
       _pageController.jumpToPage(index);
 
-      final bloc = BlocProvider.of<PatientBloc>(context);
-
       if (index == 0) {
-        allPatientListState = bloc.state;
-        bloc.add(RestorePreviousStateEvent(dashboardState!));
-      } else if (index == 1) {
-        dashboardState = bloc.state;
-        if (allPatientListState == null) {
-          bloc.add(LoadAllPatientListEvent());
-        } else {
-          bloc.add(RestorePreviousStateEvent(allPatientListState!));
+        allPatientsState = BlocProvider.of<AllPatientsBloc>(context).state;
+      }
+      if (index == 1) {
+        dashboardState = BlocProvider.of<DashboardBloc>(context).state;
+        if (allPatientsState == null) {
+          BlocProvider.of<AllPatientsBloc>(context).add(LoadAllPatientsEvent());
         }
       }
     }
@@ -68,12 +64,18 @@ class Home extends StatelessWidget {
     }
 
     Widget pageView() {
+      if (dashboardState == null) {
+        BlocProvider.of<DashboardBloc>(context).add(
+          LoadRecentVisitsEvent(DateTime.now().toString().substring(0, 10)),
+        );
+      }
+
       return PageView(
         controller: _pageController,
         onPageChanged: (index) => changePage(index),
         children: const [
-          Dashboard(),
-          AllPatientList(),
+          DashboardView(),
+          AllPatientsView(),
         ],
       );
     }

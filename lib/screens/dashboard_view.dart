@@ -1,50 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:medimate/bloc/events_and_states/load_recent_patient_list_event.dart';
-import 'package:medimate/bloc/patient_bloc.dart';
+
+import 'package:medimate/bloc/dashboard_bloc.dart';
 import 'package:medimate/data/date.dart';
-import 'package:medimate/data/visits.dart';
+import 'package:medimate/data/visit.dart';
 import 'package:medimate/models/router_delegate.dart';
 
-class Dashboard extends StatelessWidget {
-  const Dashboard({super.key});
+class DashboardView extends StatelessWidget {
+  const DashboardView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<PatientBloc, PatientState>(
-        builder: (context, state) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+      body: Column(
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  if (state is LoadRecentPatientListSuccessState)
-                    _datePicker(context, state.date),
-                  Expanded(child: _topCard(context)),
-                ],
+              BlocBuilder<DashboardBloc, DashboardState>(
+                builder: (context, state) {
+                  final date = state is LoadRecentVisitsSuccessState
+                      ? state.date
+                      : DateTime.now().toString().substring(0, 10);
+                  return _datePicker(context, date);
+                },
               ),
-              const SizedBox(
-                height: 10,
-              ),
-              if (state is LoadingRecentPatientListState)
-                const Center(
-                  child: CircularProgressIndicator(),
-                )
-              else if (state is LoadRecentPatientListSuccessState &&
-                  state.list.isNotEmpty)
-                _recentVisitsList(state.list)
-              else if (state is LoadRecentPatientListSuccessState)
-                const Center(
-                  child: Text("No visits yet!"),
-                )
-              else if (state is LoadRecentPatientListFailState)
-                Center(
-                  child: Text('${state.error}'),
-                )
+              _topCard(context),
             ],
-          );
-        },
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          BlocBuilder<DashboardBloc, DashboardState>(
+            builder: (context, state) {
+              if (state is LoadingRecentVisitsState) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (state is LoadRecentVisitsSuccessState &&
+                  state.recentVisits.isNotEmpty) {
+                return _recentVisitsList(state.recentVisits);
+              } else if (state is LoadRecentVisitsSuccessState) {
+                return const Center(
+                  child: Text("No visits yet!"),
+                );
+              } else if (state is LoadRecentVisitsFailState) {
+                return Center(
+                  child: Text('${state.error}'),
+                );
+              }
+              return Container();
+            },
+          ),
+        ],
       ),
       floatingActionButton: _floatingActionButton(context),
     );
@@ -68,8 +75,11 @@ class Dashboard extends StatelessWidget {
           if (selectedDate != null &&
               selectedDate.toString() != date &&
               context.mounted) {
-            BlocProvider.of<PatientBloc>(context)
-                .add(LoadRecentPatientListEvent(selectedDate.toString()));
+            BlocProvider.of<DashboardBloc>(context).add(
+              LoadRecentVisitsEvent(
+                selectedDate.toString().substring(0, 10),
+              ),
+            );
           }
         },
         style: ButtonStyle(
@@ -86,12 +96,15 @@ class Dashboard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              date.substring(8, 10),
-              style: TextStyle(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 30,
+            Flexible(
+              flex: 2,
+              child: Text(
+                date.substring(8),
+                style: TextStyle(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 35,
+                ),
               ),
             ),
             Text(
@@ -109,35 +122,38 @@ class Dashboard extends StatelessWidget {
   }
 
   Widget _topCard(BuildContext context) {
-    final state = BlocProvider.of<PatientBloc>(context).state;
+    final state = BlocProvider.of<DashboardBloc>(context).state;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(7, 10, 10, 10),
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        child: ListTile(
-          title: const Text(
-            'Patients Visited',
-            style: TextStyle(
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(7, 10, 10, 10),
+        child: Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          child: ListTile(
+            title: const Text(
+              'Patients Visited',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            trailing: state is LoadRecentVisitsSuccessState
+                ? state.recentVisits.isNotEmpty
+                    ? Text(state.recentVisits.length.toString())
+                    : const Text('0')
+                : null,
+            leadingAndTrailingTextStyle: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
-          ),
-          trailing: state is LoadRecentPatientListSuccessState
-              ? state.list.isNotEmpty
-                  ? Text(state.list.length.toString())
-                  : const Text('0')
-              : null,
-          leadingAndTrailingTextStyle: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
           ),
         ),
       ),
     );
   }
 
-  Widget _recentVisitsList(List<Visits> patientList) {
+  Widget _recentVisitsList(List<Visit> patientList) {
     return Expanded(
       child: Column(
         children: [
@@ -159,15 +175,20 @@ class Dashboard extends StatelessWidget {
   }
 
   Widget _recentVisitsCard(
-    List<Visits> patientList,
+    List<Visit> patientList,
     int index,
     BuildContext context,
   ) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 7, 10, 7),
       child: GestureDetector(
-        onTap: () =>
-          MyRouterDelegate.find().pushPage('/visitDetails', patientList[index]),
+        onTap: () {
+          final argument = {
+            'visit': patientList[index],
+            'enterText': 'Update',
+          };
+          MyRouterDelegate.find().pushPage('updateVisit', argument);
+        },
         child: Card(
           child: ListTile(
             title: Text(
@@ -178,7 +199,7 @@ class Dashboard extends StatelessWidget {
               ),
             ),
             subtitle: Text(
-              patientList[index].illness,
+              patientList[index].symptom!,
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
@@ -195,8 +216,21 @@ class Dashboard extends StatelessWidget {
   }
 
   Widget _floatingActionButton(BuildContext context) {
+    final argument = {
+      'visit': Visit(
+        name: '',
+        contact: '',
+        age: 0,
+        gender: '',
+        doa: '',
+        fee: 0,
+      ),
+      'enterText': 'Add',
+    };
+
     return FloatingActionButton(
-      onPressed: () => MyRouterDelegate.find().pushPage('/addVisit'),
+      onPressed: () =>
+          MyRouterDelegate.find().pushPage('updateVisit', argument),
       child: const Icon(Icons.add),
     );
   }

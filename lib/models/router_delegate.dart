@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:medimate/bloc/events_and_states/restore_previous_state_event.dart';
-import 'package:medimate/bloc/patient_bloc.dart';
-import 'package:medimate/screens/add_visit.dart';
 import 'package:medimate/screens/home.dart';
-import 'package:medimate/screens/patient_details.dart';
-import 'package:medimate/screens/visit_details.dart';
+import 'package:medimate/screens/patient_history_view.dart';
+import 'package:medimate/screens/update_visit_view.dart';
 
 class MyRouterDelegate extends RouterDelegate<List<RouteSettings>>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<List<RouteSettings>> {
@@ -18,9 +14,6 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>>
       name: '/home',
     ),
   ];
-  late PatientState? _previousHomeState;
-  late PatientState? _previousPatientDetailsState;
-  String? _pageThatPushedVisitDetails;
 
   static late MyRouterDelegate? _myRouterDelegate;
 
@@ -34,32 +27,16 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>>
 
   void pushPage(String routeName, [Object? arguments]) {
     Widget child;
-    final PatientBloc patientBloc =
-        BlocProvider.of<PatientBloc>(navigatorKey!.currentContext!);
 
     switch (routeName) {
-      case '/addVisit':
+      case 'updateVisit':
         {
-          _previousHomeState = patientBloc.state;
-          child = const AddVisit();
+          child = UpdateVisitView();
         }
         break;
-      case '/patientDetails':
+      case 'patientHistory':
         {
-          _previousHomeState = patientBloc.state;
-          child = const PatientDetails();
-        }
-        break;
-      case '/visitDetails':
-        {
-          _pageThatPushedVisitDetails = _pages.last.name;
-          if (_pageThatPushedVisitDetails == '/home') {
-            _previousHomeState = patientBloc.state;
-          }
-          if (_pageThatPushedVisitDetails == '/patientDetails') {
-            _previousPatientDetailsState = patientBloc.state;
-          }
-          child = const VisitDetails();
+          child = const PatientHistoryView();
         }
         break;
       default:
@@ -83,23 +60,7 @@ class MyRouterDelegate extends RouterDelegate<List<RouteSettings>>
   @override
   Future<bool> popRoute() {
     if (_pages.length > 1) {
-      final Page poppedPage = _pages.removeLast();
-      final PatientBloc patientBloc =
-          BlocProvider.of<PatientBloc>(navigatorKey!.currentContext!);
-
-      if (poppedPage.name == '/addVisit' ||
-          (poppedPage.name == '/visitDetails' &&
-              _pageThatPushedVisitDetails == '/home')) {
-        patientBloc.add(RestorePreviousStateEvent(_previousHomeState!));
-      }
-      if (poppedPage.name == '/patientDetails') {
-        patientBloc.add(RestorePreviousStateEvent(_previousHomeState!));
-      }
-      if (poppedPage.name == '/visitDetails' &&
-          _pageThatPushedVisitDetails == '/patientDetails') {
-        patientBloc
-            .add(RestorePreviousStateEvent(_previousPatientDetailsState!));
-      }
+      _pages.removeLast();
 
       notifyListeners();
       return Future.value(true);

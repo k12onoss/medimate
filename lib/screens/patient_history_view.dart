@@ -1,34 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:medimate/bloc/events_and_states/show_patient_details_event.dart';
-import 'package:medimate/bloc/patient_bloc.dart';
+
+import 'package:medimate/bloc/patient_history_bloc.dart';
 import 'package:medimate/data/date.dart';
-import 'package:medimate/data/visits.dart';
+import 'package:medimate/data/visit.dart';
 import 'package:medimate/models/router_delegate.dart';
 
-class PatientDetails extends StatelessWidget {
-  const PatientDetails({super.key});
+class PatientHistoryView extends StatelessWidget {
+  const PatientHistoryView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Patient Details')),
-      body: BlocBuilder<PatientBloc, PatientState>(
+      appBar: AppBar(title: const Text('Patient History')),
+      body: BlocBuilder<PatientHistoryBloc, PatientHistoryState>(
         builder: (context, state) {
-          if (state is LoadingPatientDetailsListState) {
+          if (state is LoadingPatientHistoryState) {
             return const Center(
               child: CircularProgressIndicator(),
             );
-          } else if (state is LoadPatientDetailsListSuccessState) {
-            final List<Visits> detailsList = state.patientDetailsList;
+          } else if (state is LoadPatientHistorySuccessState) {
+            final List<Visit> detailsList = state.patientHistory;
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ListTile(
                   title: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
                     child: Text(
                       detailsList[0].name.toUpperCase(),
                       style: const TextStyle(
@@ -38,8 +40,10 @@ class PatientDetails extends StatelessWidget {
                     ),
                   ),
                   subtitle: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
                     child: Text(
                       detailsList[0].contact,
                       style: const TextStyle(
@@ -52,7 +56,7 @@ class PatientDetails extends StatelessWidget {
                 _detailsListView(detailsList)
               ],
             );
-          } else if (state is LoadPatientDetailsListFailState) {
+          } else if (state is LoadPatientHistoryFailState) {
             return Center(
               child: Text(state.error.toString()),
             );
@@ -63,7 +67,7 @@ class PatientDetails extends StatelessWidget {
     );
   }
 
-  Widget _detailsListView(List<Visits> detailsList) {
+  Widget _detailsListView(List<Visit> detailsList) {
     return Expanded(
       child: ListView.builder(
         itemCount: detailsList.length,
@@ -74,7 +78,7 @@ class PatientDetails extends StatelessWidget {
   }
 
   Widget _detailsCard(
-    List<Visits> detailsList,
+    List<Visit> detailsList,
     int index,
     BuildContext context,
   ) {
@@ -86,8 +90,10 @@ class PatientDetails extends StatelessWidget {
     final date = '$day $month';
 
     return GestureDetector(
-      onTap: () =>
-        MyRouterDelegate.find().pushPage('/visitDetails', detailsList[index]),
+      onTap: () {
+        final argument = {'visit': detailsList[index], 'enterText': 'Update'};
+        MyRouterDelegate.find().pushPage('updateVisit', argument);
+      },
       child: Padding(
         padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
         child: Row(
@@ -125,14 +131,17 @@ class PatientDetails extends StatelessWidget {
                 ),
                 child: ListTile(
                   title: Text(
-                    detailsList[index].illness,
+                    detailsList[index].symptom ?? '',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     ),
                   ),
                   subtitle: Text(
-                    detailsList[index].prescription,
+                    detailsList[index].medicine ??
+                        detailsList[index].prescription ??
+                        detailsList[index].advice ??
+                        '',
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(

@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:medimate/bloc/events_and_states/load_all_patient_list_event.dart';
-import 'package:medimate/bloc/events_and_states/search_patient_event.dart';
-import 'package:medimate/bloc/events_and_states/show_patient_details_event.dart';
-import 'package:medimate/bloc/patient_bloc.dart';
-import 'package:medimate/data/visits.dart';
+
+import 'package:medimate/bloc/all_patients_bloc.dart';
+import 'package:medimate/bloc/patient_history_bloc.dart';
+import 'package:medimate/data/visit.dart';
 import 'package:medimate/models/router_delegate.dart';
 
-class AllPatientList extends StatelessWidget {
-  const AllPatientList({super.key});
+class AllPatientsView extends StatelessWidget {
+  const AllPatientsView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,18 +15,23 @@ class AllPatientList extends StatelessWidget {
       body: Column(
         children: [
           _searchBar(context),
-          BlocBuilder<PatientBloc, PatientState>(
+          BlocBuilder<AllPatientsBloc, AllPatientsState>(
             builder: (context, state) {
-              if (state is LoadingAllPatientListState ||
+              if (state is LoadingAllPatientsState ||
                   state is SearchingPatientState) {
                 return const Center(
                   child: CircularProgressIndicator(),
                 );
-              } else if (state is LoadAllPatientListSuccessState) {
-                return _patientGrid(state.list);
+              } else if (state is LoadAllPatientsSuccessState) {
+                if (state.allPatients.isEmpty) {
+                  return const Center(
+                    child: Text('No patients yet'),
+                  );
+                }
+                return _patientGrid(state.allPatients);
               } else if (state is SearchPatientSuccessState) {
                 return _patientGrid(state.patients);
-              } else if (state is LoadAllPatientListFailState) {
+              } else if (state is LoadAllPatientsFailState) {
                 return Center(
                   child: Text(state.error.toString()),
                 );
@@ -72,13 +76,13 @@ class AllPatientList extends StatelessWidget {
                   color: Theme.of(context).cardTheme.color!,
                 ),
         ),
-        onChanged: (name) =>
-            BlocProvider.of<PatientBloc>(context).add(SearchPatientEvent(name)),
+        onChanged: (name) => BlocProvider.of<AllPatientsBloc>(context)
+            .add(SearchPatientEvent(name)),
       ),
     );
   }
 
-  Widget _patientGrid(List<Visits> patientList) {
+  Widget _patientGrid(List<Visit> patientList) {
     return Expanded(
       child: GridView.builder(
         padding: const EdgeInsets.all(8),
@@ -97,7 +101,7 @@ class AllPatientList extends StatelessWidget {
   }
 
   Widget _patientCard(
-    List<Visits> patientList,
+    List<Visit> patientList,
     int index,
     BuildContext context,
   ) {
@@ -106,10 +110,9 @@ class AllPatientList extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        BlocProvider.of<PatientBloc>(context)
-            .add(ShowPatientDetailsEvent(name, contact));
-        final routerDelegate = MyRouterDelegate.find();
-        routerDelegate.pushPage('/patientDetails');
+        BlocProvider.of<PatientHistoryBloc>(context)
+            .add(LoadPatientHistoryEvent(name: name, contact: contact));
+        MyRouterDelegate.find().pushPage('patientHistory');
       },
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
