@@ -9,7 +9,11 @@ class Database {
   }
 
   Future<List<Visit>> getAllPatients() async {
-    return _isar.where().findAll();
+    return _isar
+        .where()
+        .distinctByName(caseSensitive: false)
+        .distinctByContact()
+        .findAll();
   }
 
   Future<List<Visit>> getPatientHistory(String name, String contact) async {

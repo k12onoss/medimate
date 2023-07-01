@@ -1,10 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:medimate/data/database.dart';
 import 'package:medimate/data/visit.dart';
 
 class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
-  DashboardBloc() : super(InitialState()) {
+  DashboardBloc() : super(LoadingRecentVisitsState()) {
     on<DashboardEvent>(
       (event, emit) async {
         final database = Database();
@@ -16,7 +15,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
             final recentVisits = await database.getRecentVisits(event.date);
             emit(
               LoadRecentVisitsSuccessState(
-                recentVisits: recentVisits,
+                recentVisits: recentVisits.reversed.toList(),
                 date: event.date,
               ),
             );
@@ -38,8 +37,6 @@ class LoadRecentVisitsEvent extends DashboardEvent {
 }
 
 abstract class DashboardState {}
-
-class InitialState extends DashboardState {}
 
 class LoadingRecentVisitsState extends DashboardState {}
 

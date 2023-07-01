@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:isar/isar.dart';
-
 import 'package:medimate/bloc/all_patients_bloc.dart';
 import 'package:medimate/bloc/dashboard_bloc.dart';
 import 'package:medimate/bloc/patient_history_bloc.dart';
@@ -70,7 +69,8 @@ class MyApp extends StatelessWidget {
               home: MultiBlocProvider(
                 providers: [
                   BlocProvider<DashboardBloc>(
-                    create: (context) => DashboardBloc(),
+                    create: (context) => DashboardBloc()
+                      ..add(LoadRecentVisitsEvent(DateTime.now().toString())),
                   ),
                   BlocProvider<AllPatientsBloc>(
                     create: (context) => AllPatientsBloc(),
@@ -79,9 +79,6 @@ class MyApp extends StatelessWidget {
                     create: (context) => PatientHistoryBloc(),
                   ),
                   BlocProvider<UpdateBloc>(create: (context) => UpdateBloc()),
-                  BlocProvider<DashboardBloc>(
-                    create: (context) => DashboardBloc(),
-                  ),
                 ],
                 child: Router(
                   routerDelegate: routerDelegate,

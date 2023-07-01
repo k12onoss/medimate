@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:medimate/bloc/patient_history_bloc.dart';
 import 'package:medimate/data/date.dart';
 import 'package:medimate/data/visit.dart';
@@ -11,58 +10,66 @@ class PatientHistoryView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Map arguments = ModalRoute.of(context)!.settings.arguments! as Map;
+    final String name = '${arguments['name']}';
+    final String contact = '${arguments['contact']}';
+
     return Scaffold(
       appBar: AppBar(title: const Text('Patient History')),
-      body: BlocBuilder<PatientHistoryBloc, PatientHistoryState>(
-        builder: (context, state) {
-          if (state is LoadingPatientHistoryState) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (state is LoadPatientHistorySuccessState) {
-            final List<Visit> detailsList = state.patientHistory;
-
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ListTile(
-                  title: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 5,
-                    ),
-                    child: Text(
-                      detailsList[0].name.toUpperCase(),
-                      style: const TextStyle(
-                        fontSize: 27,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  subtitle: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 5,
-                    ),
-                    child: Text(
-                      detailsList[0].contact,
-                      style: const TextStyle(
-                        fontSize: 19,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+      body: RefreshIndicator(
+        onRefresh: () async => BlocProvider.of<PatientHistoryBloc>(context)
+            .add(LoadPatientHistoryEvent(name: name, contact: contact)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListTile(
+              title: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
+                child: Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 27,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                _detailsListView(detailsList)
-              ],
-            );
-          } else if (state is LoadPatientHistoryFailState) {
-            return Center(
-              child: Text(state.error.toString()),
-            );
-          }
-          return Container();
-        },
+              ),
+              subtitle: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
+                child: Text(
+                  contact,
+                  style: const TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            BlocBuilder<PatientHistoryBloc, PatientHistoryState>(
+              builder: (context, state) {
+                if (state is LoadingPatientHistoryState) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (state is LoadPatientHistorySuccessState) {
+                  final List<Visit> detailsList = state.patientHistory;
+
+                  return _detailsListView(detailsList);
+                } else if (state is LoadPatientHistoryFailState) {
+                  return Center(
+                    child: Text(state.error.toString()),
+                  );
+                }
+                return Container();
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

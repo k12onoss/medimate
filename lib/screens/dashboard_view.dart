@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:medimate/bloc/dashboard_bloc.dart';
 import 'package:medimate/data/date.dart';
 import 'package:medimate/data/visit.dart';
@@ -12,46 +11,51 @@ class DashboardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Row(
-            children: [
-              BlocBuilder<DashboardBloc, DashboardState>(
-                builder: (context, state) {
-                  final date = state is LoadRecentVisitsSuccessState
-                      ? state.date
-                      : DateTime.now().toString().substring(0, 10);
-                  return _datePicker(context, date);
-                },
-              ),
-              _topCard(context),
-            ],
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          BlocBuilder<DashboardBloc, DashboardState>(
-            builder: (context, state) {
-              if (state is LoadingRecentVisitsState) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (state is LoadRecentVisitsSuccessState &&
-                  state.recentVisits.isNotEmpty) {
-                return _recentVisitsList(state.recentVisits);
-              } else if (state is LoadRecentVisitsSuccessState) {
-                return const Center(
-                  child: Text("No visits yet!"),
-                );
-              } else if (state is LoadRecentVisitsFailState) {
-                return Center(
-                  child: Text('${state.error}'),
-                );
-              }
-              return Container();
-            },
-          ),
-        ],
+      body: RefreshIndicator(
+        onRefresh: () async => BlocProvider.of<DashboardBloc>(context).add(
+          LoadRecentVisitsEvent(DateTime.now().toString().substring(0, 10)),
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                BlocBuilder<DashboardBloc, DashboardState>(
+                  builder: (context, state) {
+                    final date = state is LoadRecentVisitsSuccessState
+                        ? state.date
+                        : DateTime.now().toString().substring(0, 10);
+                    return _datePicker(context, date);
+                  },
+                ),
+                _topCard(context),
+              ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            BlocBuilder<DashboardBloc, DashboardState>(
+              builder: (context, state) {
+                if (state is LoadingRecentVisitsState) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (state is LoadRecentVisitsSuccessState &&
+                    state.recentVisits.isNotEmpty) {
+                  return _recentVisitsList(state.recentVisits);
+                } else if (state is LoadRecentVisitsSuccessState) {
+                  return const Center(
+                    child: Text("No visits yet!"),
+                  );
+                } else if (state is LoadRecentVisitsFailState) {
+                  return Center(
+                    child: Text('${state.error}'),
+                  );
+                }
+                return Container();
+              },
+            ),
+          ],
+        ),
       ),
       floatingActionButton: _floatingActionButton(context),
     );

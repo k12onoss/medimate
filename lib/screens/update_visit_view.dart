@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:country_dial_code/country_dial_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:medimate/bloc/dashboard_bloc.dart';
 import 'package:medimate/bloc/patient_history_bloc.dart';
 import 'package:medimate/bloc/update_bloc.dart';
@@ -116,7 +115,7 @@ class UpdateVisitView extends StatelessWidget {
                       ? visitDetails[parameter].toString().substring(3)
                       : visitDetails[parameter].toString()
                   : null,
-          readOnly: enterText == 'Update' && (index == 0 || index == 1),
+          readOnly: enterText == 'Update' && (index == 0),
           textCapitalization: TextCapitalization.words,
           textAlignVertical: TextAlignVertical.center,
           decoration: InputDecoration(

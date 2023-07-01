@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:medimate/data/database.dart';
 import 'package:medimate/data/visit.dart';
 

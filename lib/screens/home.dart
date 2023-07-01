@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:medimate/bloc/all_patients_bloc.dart';
-import 'package:medimate/bloc/dashboard_bloc.dart';
 import 'package:medimate/bloc/theme_cubit.dart';
 import 'package:medimate/screens/all_patients_view.dart';
 import 'package:medimate/screens/dashboard_view.dart';
@@ -16,7 +14,6 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AllPatientsState? allPatientsState;
-    DashboardState? dashboardState;
 
     void changePage(int index) {
       _currentIndex.value = index;
@@ -26,7 +23,6 @@ class Home extends StatelessWidget {
         allPatientsState = BlocProvider.of<AllPatientsBloc>(context).state;
       }
       if (index == 1) {
-        dashboardState = BlocProvider.of<DashboardBloc>(context).state;
         if (allPatientsState == null) {
           BlocProvider.of<AllPatientsBloc>(context).add(LoadAllPatientsEvent());
         }
@@ -64,12 +60,6 @@ class Home extends StatelessWidget {
     }
 
     Widget pageView() {
-      if (dashboardState == null) {
-        BlocProvider.of<DashboardBloc>(context).add(
-          LoadRecentVisitsEvent(DateTime.now().toString().substring(0, 10)),
-        );
-      }
-
       return PageView(
         controller: _pageController,
         onPageChanged: (index) => changePage(index),

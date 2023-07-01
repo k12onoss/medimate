@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:medimate/data/database.dart';
 import 'package:medimate/data/visit.dart';
 
@@ -18,7 +17,11 @@ class PatientHistoryBloc
               event.name,
               event.contact,
             );
-            emit(LoadPatientHistorySuccessState(patientHistory));
+            emit(
+              LoadPatientHistorySuccessState(
+                patientHistory.reversed.toList(),
+              ),
+            );
           } catch (error) {
             emit(LoadPatientHistoryFailState(error as Error));
           }
